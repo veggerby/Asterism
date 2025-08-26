@@ -8,7 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ### Added
 
-- (placeholder) Add new entries here.
+- Leap second staleness policy: future instants reuse last known TAI−UTC offset and expose `LeapSeconds.IsStale`.
+- Strict mode (`LeapSeconds.StrictMode` or env `ASTERISM_TIME_STRICT_LEAP_SECONDS=true`) to throw on stale instants.
+- Configurable `LeapSeconds.StalenessHorizonYears` (default 10).
+- API additions: `LeapSeconds.GetOffset`, `LeapSeconds.OffsetResult`, `TimeOffsets.SecondsUtcToTaiWithStale`.
 
 ## [0.1.0] - 2025-08-25
 

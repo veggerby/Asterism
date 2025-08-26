@@ -10,7 +10,16 @@ public readonly record struct AstroInstant(System.DateTime Utc)
     /// <summary>
     /// Creates an <see cref="AstroInstant"/> from a UTC <see cref="System.DateTime"/>. The value is converted to universal time if needed.
     /// </summary>
-    public static AstroInstant FromUtc(System.DateTime utc) => new(AsUtc(utc));
+    public static AstroInstant FromUtc(System.DateTime utc)
+    {
+        var normalized = AsUtc(utc);
+        if (LeapSeconds.StrictMode && LeapSeconds.IsStale(normalized))
+        {
+            throw new UnsupportedTimeInstantException(normalized, LeapSeconds.LastSupportedInstantUtc,
+                "UTC instant is stale relative to bundled leap second data (strict mode). Update data or disable strict mode.");
+        }
+        return new(normalized);
+    }
 
     private static System.DateTime AsUtc(System.DateTime dt) =>
         dt.Kind == System.DateTimeKind.Utc ? dt : dt.ToUniversalTime();

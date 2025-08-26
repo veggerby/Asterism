@@ -17,7 +17,7 @@ Workflow `ci.yml`:
 
 ## 3. **Release process**
 
-1. Update leap-seconds / ΔT data if needed.
+1. Update leap-seconds / ΔT data if needed (check `LeapSeconds.LastSupportedInstantUtc`).
 2. Update `CHANGELOG.md`.
 3. Tag version `vX.Y.Z`.
 4. GitHub Actions packs & pushes to NuGet.
@@ -25,7 +25,8 @@ Workflow `ci.yml`:
 ## 4. **Conventions**
 
 - Style: file-scoped namespaces, one public type per file, `record struct` (or `readonly struct`) for lightweight immutable value types.
-- XML doc comments on all public APIs (treat warnings as errors in CI later).
+- XML doc comments on all public APIs (warnings treated as errors in library builds).
+- Leap seconds: default mode returns last known offset for future instants and marks them stale; strict mode (env `ASTERISM_TIME_STRICT_LEAP_SECONDS=true`) throws.
 - Tests: xUnit; project layout mirrors `src/` folder names.
 - Benchmarks: `bench/` using BenchmarkDotNet.
 - Semantic versioning; per-package CHANGELOG + aggregated root CHANGELOG.

@@ -9,4 +9,13 @@ public static class TimeOffsets
     /// Returns TAI − UTC in whole seconds for the supplied UTC instant, accounting for leap seconds.
     /// </summary>
     public static int SecondsUtcToTai(System.DateTime utc) => LeapSeconds.SecondsBetweenUtcAndTai(utc);
+
+    /// <summary>
+    /// Returns TAI − UTC offset and staleness metadata.
+    /// </summary>
+    public static (int offsetSeconds, bool isStale) SecondsUtcToTaiWithStale(System.DateTime utc)
+    {
+        var result = LeapSeconds.GetOffset(utc);
+        return (result.OffsetSeconds, result.IsStale);
+    }
 }

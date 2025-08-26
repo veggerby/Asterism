@@ -9,7 +9,7 @@ Aggregated notable changes across all Asterism packages. For per-package details
 
 ### Added
 
-- (placeholder)
+- Asterism.Time: leap-second staleness policy (`LeapSeconds.IsStale`) and strict mode toggle (env `ASTERISM_TIME_STRICT_LEAP_SECONDS`).
 
 ## [0.1.0] - 2025-08-25
 
