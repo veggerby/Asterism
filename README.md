@@ -113,7 +113,28 @@ dotnet run -c Release -p bench/Asterism.Benchmarks
 
 **Leap seconds & staleness:** The bundled leap-second table currently ends at 2017-01-01 (TAI−UTC = 37s). By default, future instants reuse the last known offset and are marked as *stale* (you can query staleness through the API). Enable strict mode (set environment variable `ASTERISM_TIME_STRICT_LEAP_SECONDS=true` or toggle `LeapSeconds.StrictMode`) to throw instead when an instant lies beyond the configurable horizon (default 10 years past the last table entry).
 
-Update the package (or supply a custom provider in a future release) to refresh data when new leap seconds are announced.
+### Provider cookbook
+
+You can swap data providers at application startup:
+
+```csharp
+using Asterism.Time;
+
+TimeProviders.LeapSeconds = new LeapSecondFileProvider("leap_seconds.csv");
+TimeProviders.DeltaT      = new DeltaTBlendedProvider();
+TimeProviders.Eop         = new EopNoneProvider(); // future: file-based EOP snapshot
+```
+
+Leap second CSV schema:
+
+```text
+# ISO8601_UTC,TAI_MINUS_UTC
+1972-07-01T00:00:00Z,11
+...
+2017-01-01T00:00:00Z,37
+```
+
+Update the package (or supply a custom provider) to refresh data when new leap seconds are announced.
 
 ---
 

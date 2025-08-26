@@ -32,6 +32,12 @@ Sidereal time connects Earth rotation to celestial coordinates.
 
 Used to compute **Local Hour Angle (LHA)** → Horizontal coordinates.
 
+Implementation notes (current library state):
+
+- ERA formula (IAU 2000): ERA = 2π * (0.7790572732640 + 1.00273781191135448 * (JD_UT1 − 2451545.0)).
+- GMST uses a simplified polynomial (truncated) added to ERA; accuracy is sufficient for demonstration and will be refined with full precession–nutation.
+- UT1 fallback: if no ΔUT1 is available via an IEopProvider, UTC is used (introduces up to ~1 s error in sidereal angle).
+
 ---
 
 ## 3. Coordinate Frames
@@ -90,7 +96,7 @@ Transformations involve:
 ## 7. Data You Must Manage
 
 - **Leap Seconds** — ship a frozen snapshot, update with new releases.
-- **ΔT** — polynomial approximation for recent decades; hybrid (table + poly) later.
+- **ΔT** — blended sparse table + interpolation, mild extrapolation; future: ingest published tables.
 - **EOP** (optional, Ultra profile) — UT1–UTC, polar motion, dX/dY (from IERS Bulletin A).
 
 ---
@@ -109,6 +115,7 @@ Transformations involve:
 ## 9. Implementation Roadmap
 
 - **v0.1** — JD/MJD, UTC↔TAI↔TT↔TDB, Equatorial→Horizontal with GMST.
+- **v0.2** — Provider architecture (leap seconds, ΔT), baseline sidereal helpers (ERA/GMST), TDB series upgrade.
 - **v0.2** — IAU 2006/2000A precession-nutation, proper sidereal.
 - **v0.3** — Add Ecliptic/Galactic, proper motion, parallax.
 - **v0.4** — Aberration, advanced refraction, optional EOP ingestion.
@@ -116,6 +123,10 @@ Transformations involve:
 ---
 
 ## 10. Licensing & Provenance
+
+ΔT sparse anchors: derived from public historical compilations (USNO/NASA published ΔT tables; values approximated for compactness).
+
+TDB correction series: Meeus-based two-term sine (Earth mean anomaly) for millisecond-level accuracy.
 
 - **Do not copy SOFA code verbatim** — re-implement from papers/specs for idiomatic C#.
 - Cite references in source code comments.

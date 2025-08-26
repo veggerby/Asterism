@@ -22,4 +22,8 @@
   <ProjectReference Include="../../src/Asterism.Time/Asterism.Time.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="Assets/leap_seconds_sample.csv" CopyToOutputDirectory="Always" />
+  </ItemGroup>
+
 </Project>

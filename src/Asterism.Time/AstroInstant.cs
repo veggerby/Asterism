@@ -10,6 +10,9 @@ public readonly record struct AstroInstant(System.DateTime Utc)
     /// <summary>
     /// Creates an <see cref="AstroInstant"/> from a UTC <see cref="System.DateTime"/>. The value is converted to universal time if needed.
     /// </summary>
+    /// <param name="utc">Input date-time (kind may be local/unspecified; will be converted to UTC).</param>
+    /// <returns>Normalized <see cref="AstroInstant"/> representing the supplied UTC instant.</returns>
+    /// <exception cref="UnsupportedTimeInstantException">Thrown when leap second data is stale in strict mode.</exception>
     public static AstroInstant FromUtc(System.DateTime utc)
     {
         var normalized = AsUtc(utc);
@@ -18,11 +21,14 @@ public readonly record struct AstroInstant(System.DateTime Utc)
             throw new UnsupportedTimeInstantException(normalized, LeapSeconds.LastSupportedInstantUtc,
                 "UTC instant is stale relative to bundled leap second data (strict mode). Update data or disable strict mode.");
         }
+
         return new(normalized);
     }
 
-    private static System.DateTime AsUtc(System.DateTime dt) =>
-        dt.Kind == System.DateTimeKind.Utc ? dt : dt.ToUniversalTime();
+    private static System.DateTime AsUtc(System.DateTime dt)
+    {
+        return dt.Kind == System.DateTimeKind.Utc ? dt : dt.ToUniversalTime();
+    }
 
     /// <summary>
     /// Converts the instant to a <see cref="JulianDay"/> in the specified <see cref="TimeScale"/>.
@@ -30,6 +36,7 @@ public readonly record struct AstroInstant(System.DateTime Utc)
     /// </summary>
     /// <param name="scale">Desired time scale (UTC, TAI, TT, or TDB).</param>
     /// <param name="deltaT">Optional ΔT provider (currently unused placeholder for future refinement).</param>
+    /// <returns><see cref="JulianDay"/> corresponding to this instant in the requested time scale.</returns>
     public JulianDay ToJulianDay(TimeScale scale = TimeScale.TT, IDeltaTProvider? deltaT = null)
     {
         var jdUtc = JulianDay.FromDateTimeUtc(Utc).Value;
@@ -37,12 +44,13 @@ public readonly record struct AstroInstant(System.DateTime Utc)
         var taiOffset = TimeOffsets.SecondsUtcToTai(Utc);
         var jdTai = jdUtc + taiOffset / 86400.0;
         var jdTt = jdTai + 32.184 / 86400.0; // TT = TAI + 32.184 s
+
         return scale switch
         {
             TimeScale.UTC => new(jdUtc),
             TimeScale.TAI => new(jdTai),
             TimeScale.TT => new(jdTt),
-            TimeScale.TDB => new(jdTt + Tdb.ApproxRelativisticCorr(jdTt) / 86400.0),
+            TimeScale.TDB => new(jdTt + Tdb.ApproxRelativisticCorrSeconds(jdTt) / 86400.0),
             _ => new(jdUtc)
         };
     }
