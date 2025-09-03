@@ -13,6 +13,7 @@ public static class TimeProviders
     private static volatile ILeapSecondProvider _leapSeconds = new BuiltInLeapSecondProvider();
     private static volatile IDeltaTProvider _deltaT = new DeltaTBlendedProvider();
     private static volatile IEopProvider _eop = new EopNoneProvider();
+    private static volatile Asterism.Time.Tdb.ITdbCorrectionProvider _tdb = new Asterism.Time.Tdb.SimpleTdbProvider();
 
     /// <summary>Current leap-second provider (defaults to built-in static table snapshot).</summary>
     public static ILeapSecondProvider LeapSeconds => _leapSeconds;
@@ -22,6 +23,8 @@ public static class TimeProviders
 
     /// <summary>Current EOP provider (ΔUT1) for UT1 / sidereal computations (defaults to none).</summary>
     public static IEopProvider Eop => _eop;
+    /// <summary>Current provider for TDB−TT relativistic correction.</summary>
+    public static Asterism.Time.Tdb.ITdbCorrectionProvider Tdb => _tdb;
 
     /// <summary>
     /// Atomically replaces the leap-second provider.
@@ -69,6 +72,20 @@ public static class TimeProviders
         }
 
         return Interlocked.Exchange(ref _eop, provider);
+    }
+
+    /// <summary>
+    /// Atomically replaces the TDB correction provider.
+    /// </summary>
+    /// <param name="provider">New provider (not null).</param>
+    /// <returns>Previous provider.</returns>
+    public static Asterism.Time.Tdb.ITdbCorrectionProvider SetTdb(Asterism.Time.Tdb.ITdbCorrectionProvider provider)
+    {
+        if (provider is null)
+        {
+            throw new ArgumentNullException(nameof(provider));
+        }
+        return Interlocked.Exchange(ref _tdb, provider);
     }
 
     /// <summary>

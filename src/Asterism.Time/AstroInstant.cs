@@ -63,7 +63,7 @@ public readonly record struct AstroInstant(System.DateTime Utc)
             TimeScale.UTC => new(jdUtc),
             TimeScale.TAI => new(jdTai),
             TimeScale.TT => new(jdTt),
-            TimeScale.TDB => new(jdTt + Tdb.ApproxRelativisticCorrSeconds(jdTt) / 86400.0),
+            TimeScale.TDB => new(jdTt + TimeProviders.Tdb.GetTdbMinusTtSeconds(new JulianDay(jdTt)) / 86400.0),
             _ => new(jdUtc)
         };
     }

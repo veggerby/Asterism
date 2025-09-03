@@ -12,12 +12,13 @@ public class LeapSecondsOffsetResultTests
     public void HorizonBoundary_NotStale_BeyondBoundary_Stale()
     {
         // arrange
-        var last = LeapSeconds.LastSupportedInstantUtc; // 2017-01-01 (start-of-day)
         var prevHorizon = LeapSeconds.StalenessHorizonYears;
         var prevStrict = LeapSeconds.StrictMode;
+        LeapSeconds.StrictMode = false; // disable before capturing last to avoid exception if previously stale
+        var last = LeapSeconds.LastSupportedInstantUtc; // provider-dependent
         try
         {
-            LeapSeconds.StrictMode = false; // ensure no exception thrown when probing stale region
+            LeapSeconds.StrictMode = false; // reinforce
             // Use existing horizon (default 10) unless user changed it
             var horizonInstant = last.AddYears(LeapSeconds.StalenessHorizonYears);
             var justBeyond = horizonInstant.AddDays(1);

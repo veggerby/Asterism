@@ -36,7 +36,7 @@ public static class TimeScaleConversion
         double ut1MinusUtc = ttMinusUtc - deltaT;
         // TDB - TT small periodic correction
         var astro = AstroInstant.FromUtc(instantUtc);
-        double tdbMinusTt = Tdb.ApproxRelativisticCorrSeconds(astro.ToJulianDay(TimeScale.TT).Value);
+        double tdbMinusTt = TimeProviders.Tdb.GetTdbMinusTtSeconds(astro.ToJulianDay(TimeScale.TT));
         double tdbMinusUtc = ttMinusUtc + tdbMinusTt;
 
         double FromUtc(TimeScale scale) => scale switch
