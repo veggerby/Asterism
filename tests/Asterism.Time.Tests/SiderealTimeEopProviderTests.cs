@@ -27,11 +27,11 @@ public class SiderealTimeEopProviderTests
         try
         {
             var delta = 0.50; // 0.5 s UT1 ahead of UTC
-            TimeProviders.Eop = new FixedEopProvider(delta);
+            TimeProviders.SetEop(new FixedEopProvider(delta));
 
             // act
             var eraUtc = SiderealTime.EraRadians(utc, null); // will use provider via ToUt1Utc
-            TimeProviders.Eop = new FixedEopProvider(0);
+            TimeProviders.SetEop(new FixedEopProvider(0));
             var eraNoDelta = SiderealTime.EraRadians(utc, null);
 
             // Earth's rotation ~ 2π per sidereal day (~86164.091 s)
@@ -46,7 +46,7 @@ public class SiderealTimeEopProviderTests
         }
         finally
         {
-            TimeProviders.Eop = prev;
+            TimeProviders.SetEop(prev);
         }
     }
 }

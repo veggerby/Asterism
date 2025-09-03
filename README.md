@@ -115,15 +115,17 @@ dotnet run -c Release -p bench/Asterism.Benchmarks
 
 ### Provider cookbook
 
-You can swap data providers at application startup:
+You can swap data providers at application startup (atomic publication helpers provided):
 
 ```csharp
 using Asterism.Time;
 
-TimeProviders.LeapSeconds = new LeapSecondFileProvider("leap_seconds.csv");
-TimeProviders.DeltaT      = new DeltaTBlendedProvider();
-TimeProviders.Eop         = new EopNoneProvider(); // future: file-based EOP snapshot
+TimeProviders.SetLeapSeconds(new LeapSecondFileProvider("leap_seconds.csv"));
+TimeProviders.SetDeltaT(new DeltaTBlendedProvider());
+TimeProviders.SetEop(new EopNoneProvider()); // future: file-based EOP snapshot
 ```
+
+These should typically be configured once during startup. Repeated swaps (e.g. reloading EOP tables) are safe; each Set* call uses Interlocked.Exchange for atomic replacement.
 
 Leap second CSV schema:
 
