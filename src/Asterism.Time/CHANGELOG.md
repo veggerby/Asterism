@@ -16,12 +16,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 - Central offset query API `TimeScaleConversion.GetOffsetSeconds`.
 - Atomic provider swap helpers (`TimeProviders.SetLeapSeconds`, `SetDeltaT`, `SetEop`) and CSV reload API `TimeProviders.ReloadLeapSecondsFromFile`.
 - Tests: timescale conversion offsets, ΔT influence on inferred UT1, leap second reload behavior.
+- Pluggable TDB correction infrastructure: `ITdbCorrectionProvider`, `SimpleTdbProvider`, `MeeusTdbProvider` (extensible periodic series).
+- EOP ingestion: `CsvEopProvider` (daily ΔUT1 CSV) with binary search + null fallback for out-of-range dates.
+- Provider swap: `TimeProviders.SetTdb` for atomic TDB correction provider replacement.
 
 ### Changed
 
 - Extended default `LeapSeconds.StalenessHorizonYears` to 15 (covers through 2032 without staleness for current dates).
 - Clarified built-in leap second snapshot (no new leap seconds announced through 2025) and added maintenance docs (`tools/leapseconds/`).
 - `AstroInstant.ToJulianDay` now requests ΔT from the active provider (previous optional parameter retained for override only).
+- TDB computation now delegated to `TimeProviders.Tdb` (provider-driven) instead of static helper.
 
 ## [0.1.0] - 2025-08-25
 

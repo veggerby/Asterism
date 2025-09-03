@@ -122,7 +122,8 @@ using Asterism.Time;
 
 TimeProviders.SetLeapSeconds(new LeapSecondFileProvider("leap_seconds.csv"));
 TimeProviders.SetDeltaT(new DeltaTBlendedProvider());
-TimeProviders.SetEop(new EopNoneProvider()); // future: file-based EOP snapshot
+TimeProviders.SetEop(new EopNoneProvider()); // or new CsvEopProvider("dut1.csv") when you have daily ΔUT1
+TimeProviders.SetTdb(new SimpleTdbProvider()); // or new MeeusTdbProvider() for expanded periodic series
 ```
 
 These should typically be configured once during startup. Repeated swaps (e.g. reloading EOP tables) are safe; each Set* call uses Interlocked.Exchange for atomic replacement.
@@ -137,6 +138,22 @@ Leap second CSV schema:
 ```
 
 Update the package (or supply a custom provider) to refresh data when new leap seconds are announced.
+
+Daily ΔUT1 CSV schema (EOP):
+
+```text
+# date,dut1_seconds
+2025-01-01,0.114843
+2025-01-02,0.115004
+```
+
+Reload leap seconds or EOP at runtime (atomic):
+
+```csharp
+TimeProviders.ReloadLeapSecondsFromFile("leap_seconds.csv");
+TimeProviders.SetEop(new CsvEopProvider("dut1.csv"));
+TimeProviders.SetTdb(new MeeusTdbProvider());
+```
 
 ---
 
