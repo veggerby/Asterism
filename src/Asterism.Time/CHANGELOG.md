@@ -13,6 +13,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 - Configurable `LeapSeconds.StalenessHorizonYears` (default 10).
 - API additions: `LeapSeconds.GetOffset`, `LeapSeconds.OffsetResult`, `TimeOffsets.SecondsUtcToTaiWithStale`.
 
+### Changed
+
+- Extended default `LeapSeconds.StalenessHorizonYears` to 15 (covers through 2032 without staleness for current dates).
+- Clarified built-in leap second snapshot (no new leap seconds announced through 2025) and added maintenance docs (`tools/leapseconds/`).
+
 ## [0.1.0] - 2025-08-25
 
 ### Initial release

@@ -4,7 +4,8 @@ namespace Asterism.Time;
 
 /// <summary>
 /// Leap second tracking: stores cumulative TAI − UTC offsets at effective dates (start instants after insertion).
-/// Table current through 2017-01-01 (offset 37 s). Update upon new IERS announcements.
+/// Table current through 2017-01-01 (offset 37 s). No leap seconds have been added through 2025.
+/// Update upon new IERS announcements (see tools/leapseconds/README.md).
 /// </summary>
 public static class LeapSeconds
 {
@@ -14,8 +15,8 @@ public static class LeapSeconds
     // Delegates to current leap-second provider (analyzer may falsely warn before compilation order).
     public static System.DateTime LastSupportedInstantUtc => TimeProviders.LeapSeconds.LastChangeUtc;
 
-    /// <summary>Configurable staleness horizon in years beyond <see cref="LastSupportedInstantUtc"/> (default 10).</summary>
-    public static int StalenessHorizonYears { get; set; } = 10;
+    /// <summary>Configurable staleness horizon in years beyond <see cref="LastSupportedInstantUtc"/> (default 15 to cover current gap since 2017).</summary>
+    public static int StalenessHorizonYears { get; set; } = 15;
 
     /// <summary>When true, stale instants cause <see cref="UnsupportedTimeInstantException"/> to be thrown (can be toggled at runtime).</summary>
     public static bool StrictMode { get; set; } = ReadStrictModeFromEnvironment();

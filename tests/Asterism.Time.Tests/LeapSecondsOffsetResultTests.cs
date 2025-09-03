@@ -51,8 +51,8 @@ public class LeapSecondsOffsetResultTests
         var horizon = last.AddYears(LeapSeconds.StalenessHorizonYears);
         var inside = horizon.AddDays(-30);
         var outside = horizon.AddMonths(6);
-    var prevStrict = LeapSeconds.StrictMode;
-    LeapSeconds.StrictMode = false;
+        var prevStrict = LeapSeconds.StrictMode;
+        LeapSeconds.StrictMode = false;
 
         // act
         var insideRes = LeapSeconds.GetOffset(inside);
@@ -63,6 +63,6 @@ public class LeapSecondsOffsetResultTests
         Assert.True(outsideRes.IsStale);
         Assert.True(outsideRes.OffsetSeconds >= insideRes.OffsetSeconds); // leap seconds non-decreasing historically
 
-    LeapSeconds.StrictMode = prevStrict;
+        LeapSeconds.StrictMode = prevStrict;
     }
 }

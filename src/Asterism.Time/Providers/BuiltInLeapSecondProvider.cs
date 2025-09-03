@@ -1,8 +1,12 @@
 namespace Asterism.Time.Providers;
 
 /// <summary>
-/// Built-in leap second provider wrapping the legacy static table.
-/// Independent from <see cref="LeapSeconds"/> to avoid recursion.
+/// Built-in leap second provider wrapping the legacy static table. Independent from <see cref="LeapSeconds"/> to avoid recursion.
+/// <remarks>
+/// IERS has not announced any leap seconds after 2017-01-01 as of 2025. If a future bulletin adds a leap second,
+/// update this table (append the effective 00:00:00 UTC date-of-change with the new cumulative total) and adjust
+/// the source tag + changelog. A helper script is provided under `tools/leapseconds/`.
+/// </remarks>
 /// </summary>
 internal sealed class BuiltInLeapSecondProvider : ILeapSecondProvider
 {
@@ -38,7 +42,7 @@ internal sealed class BuiltInLeapSecondProvider : ILeapSecondProvider
     };
 
     public System.DateTime LastChangeUtc => Table[^1].dateUtc;
-    public string Source => "Built-in snapshot (2017-01-01)";
+    public string Source => "Built-in snapshot (2017-01-01, no changes announced through 2025)";
 
     public (int taiMinusUtcSeconds, System.DateTime lastChangeUtc) GetOffset(System.DateTime utc)
     {
