@@ -1,0 +1,11 @@
+<Project>
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <!-- Apply stricter settings only to packable library projects -->
+    <TreatWarningsAsErrors Condition="'$(IsPackable)'=='true'">true</TreatWarningsAsErrors>
+    <GenerateDocumentationFile Condition="'$(IsPackable)'=='true'">true</GenerateDocumentationFile>
+    <ContinuousIntegrationBuild Condition=" '$(CI)' == 'true' ">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+</Project>
