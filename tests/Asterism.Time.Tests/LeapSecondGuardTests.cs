@@ -21,9 +21,18 @@ public class LeapSecondGuardTests
     public void FromUtc_FarFuture_DefaultMode_DoesNotThrowButIsStale()
     {
         var dt = new DateTime(2035, 1, 1, 0, 0, 0, DateTimeKind.Utc); // well beyond horizon default 10y -> stale
-        var instant = AstroInstant.FromUtc(dt);
-        Assert.True(LeapSeconds.IsStale(dt));
-        Assert.Equal(dt, instant.Utc);
+        var prev = LeapSeconds.StrictMode;
+        try
+        {
+            LeapSeconds.StrictMode = false; // ensure non-throw path
+            var instant = AstroInstant.FromUtc(dt);
+            Assert.True(LeapSeconds.IsStale(dt));
+            Assert.Equal(dt, instant.Utc);
+        }
+        finally
+        {
+            LeapSeconds.StrictMode = prev;
+        }
     }
 
     [Fact]
