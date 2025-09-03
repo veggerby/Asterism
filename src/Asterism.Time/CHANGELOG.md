@@ -12,11 +12,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 - Strict mode (`LeapSeconds.StrictMode` or env `ASTERISM_TIME_STRICT_LEAP_SECONDS=true`) to throw on stale instants.
 - Configurable `LeapSeconds.StalenessHorizonYears` (default 10).
 - API additions: `LeapSeconds.GetOffset`, `LeapSeconds.OffsetResult`, `TimeOffsets.SecondsUtcToTaiWithStale`.
+- ΔT integration path in `AstroInstant.ToJulianDay` (now derives UT1 internally via registered `IDeltaTProvider`).
+- Central offset query API `TimeScaleConversion.GetOffsetSeconds`.
+- Atomic provider swap helpers (`TimeProviders.SetLeapSeconds`, `SetDeltaT`, `SetEop`) and CSV reload API `TimeProviders.ReloadLeapSecondsFromFile`.
+- Tests: timescale conversion offsets, ΔT influence on inferred UT1, leap second reload behavior.
 
 ### Changed
 
 - Extended default `LeapSeconds.StalenessHorizonYears` to 15 (covers through 2032 without staleness for current dates).
 - Clarified built-in leap second snapshot (no new leap seconds announced through 2025) and added maintenance docs (`tools/leapseconds/`).
+- `AstroInstant.ToJulianDay` now requests ΔT from the active provider (previous optional parameter retained for override only).
 
 ## [0.1.0] - 2025-08-25
 

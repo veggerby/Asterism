@@ -70,4 +70,18 @@ public static class TimeProviders
 
         return Interlocked.Exchange(ref _eop, provider);
     }
+
+    /// <summary>
+    /// Loads a leap second CSV file and atomically replaces the current leap second provider.
+    /// </summary>
+    /// <param name="path">Path to leap second CSV (see <see cref="LeapSecondFileProvider"/> remarks for schema).</param>
+    /// <returns>The previously registered leap second provider.</returns>
+    /// <exception cref="ArgumentException">If <paramref name="path"/> is null/empty.</exception>
+    /// <exception cref="System.IO.IOException">If the file cannot be read.</exception>
+    /// <exception cref="System.FormatException">If CSV parsing fails.</exception>
+    public static ILeapSecondProvider ReloadLeapSecondsFromFile(string path)
+    {
+        var provider = new LeapSecondFileProvider(path);
+        return SetLeapSeconds(provider);
+    }
 }

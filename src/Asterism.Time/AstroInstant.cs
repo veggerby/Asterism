@@ -1,3 +1,5 @@
+using Asterism.Time.Providers;
+
 namespace Asterism.Time;
 
 /// <summary>
@@ -32,18 +34,29 @@ public readonly record struct AstroInstant(System.DateTime Utc)
 
     /// <summary>
     /// Converts the instant to a <see cref="JulianDay"/> in the specified <see cref="TimeScale"/>.
-    /// Applies leap second, TT (32.184 s), and approximate TDB periodic relativistic correction as required.
+    /// Applies leap seconds (UTC→TAI), TT offset (32.184 s), ΔT (TT−UT1) where needed and the approximate
+    /// TDB periodic relativistic correction. ΔT is obtained from the registered provider unless one is supplied.
     /// </summary>
     /// <param name="scale">Desired time scale (UTC, TAI, TT, or TDB).</param>
     /// <param name="deltaT">Optional ΔT provider (currently unused placeholder for future refinement).</param>
     /// <returns><see cref="JulianDay"/> corresponding to this instant in the requested time scale.</returns>
     public JulianDay ToJulianDay(TimeScale scale = TimeScale.TT, IDeltaTProvider? deltaT = null)
     {
+        // Base UTC JD
         var jdUtc = JulianDay.FromDateTimeUtc(Utc).Value;
-        deltaT ??= DeltaTProviders.Default;
+
+        // TAI offset (integer leap seconds)
         var taiOffset = TimeOffsets.SecondsUtcToTai(Utc);
         var jdTai = jdUtc + taiOffset / 86400.0;
-        var jdTt = jdTai + 32.184 / 86400.0; // TT = TAI + 32.184 s
+
+        // TT = TAI + 32.184 s
+        var jdTt = jdTai + 32.184 / 86400.0;
+
+        // ΔT = TT − UT1 (seconds)
+        deltaT ??= TimeProviders.DeltaT;
+        var deltaTSeconds = deltaT.DeltaTSeconds(Utc);
+        // UT1 JD available if needed for high-precision sidereal or Earth rotation coupling
+        var jdUt1 = jdTt - (deltaTSeconds / 86400.0); // rearranged: UT1 = TT − ΔT (currently unused here)
 
         return scale switch
         {
