@@ -1,5 +1,3 @@
-using System;
-
 namespace Asterism.Time.Providers;
 
 /// <summary>

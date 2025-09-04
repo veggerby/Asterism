@@ -1,17 +1,9 @@
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
-using Asterism.Time;
 using Asterism.Time.Providers;
 using Asterism.Time.Tdb;
 
 using AwesomeAssertions;
-
-using Xunit;
 
 namespace Asterism.Time.Tests;
 
@@ -19,6 +11,7 @@ namespace Asterism.Time.Tests;
 /// Concurrency and randomized stress tests to validate thread-safety of provider swaps and core conversions.
 /// </summary>
 [Collection("LeapSecondState")] // serialize with other leap second mutation tests
+[Trait("Category", "Slow")]
 public class ConcurrencyStressTests
 {
     private static readonly DateTime Start = new(1972, 1, 1, 0, 0, 0, DateTimeKind.Utc);

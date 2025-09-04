@@ -18,7 +18,7 @@ public static class TimeScaleConversion
     /// <param name="instantUtc">Instant expressed in UTC (only its UTC moment is used; leap seconds & ΔT applied internally).</param>
     /// <param name="deltaTProvider">Optional ΔT provider override (TT − UT1). Defaults to <see cref="TimeProviders.DeltaT"/>.</param>
     /// <returns>Offset seconds (to - from). 0 when scales identical.</returns>
-    public static double GetOffsetSeconds(TimeScale from, TimeScale to, System.DateTime instantUtc, IDeltaTProvider? deltaTProvider = null)
+    public static double GetOffsetSeconds(TimeScale from, TimeScale to, DateTime instantUtc, IDeltaTProvider? deltaTProvider = null)
     {
         if (from == to)
         {

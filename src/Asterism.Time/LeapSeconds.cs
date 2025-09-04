@@ -12,8 +12,9 @@ public static class LeapSeconds
     /// <summary>
     /// Inclusive UTC date of the last leap second table entry start-of-day (the day the new offset takes effect).
     /// </summary>
+    // Inclusive UTC date of the last leap second table entry start-of-day (the day the new offset takes effect).
     // Delegates to current leap-second provider (analyzer may falsely warn before compilation order).
-    public static System.DateTime LastSupportedInstantUtc => TimeProviders.LeapSeconds.LastChangeUtc;
+    public static DateTime LastSupportedInstantUtc => TimeProviders.LeapSeconds.LastChangeUtc;
 
     /// <summary>Configurable staleness horizon in years beyond <see cref="LastSupportedInstantUtc"/> (default 15 to cover current gap since 2017).</summary>
     private static int _stalenessHorizonYears = 15;
@@ -25,7 +26,7 @@ public static class LeapSeconds
         {
             if (value < 1 || value > 100)
             {
-                throw new System.ArgumentOutOfRangeException(nameof(value), value, "Horizon years must be between 1 and 100.");
+                throw new ArgumentOutOfRangeException(nameof(value), value, "Horizon years must be between 1 and 100.");
             }
             _stalenessHorizonYears = value;
         }
@@ -63,12 +64,12 @@ public static class LeapSeconds
     /// <summary>
     /// Returns cumulative TAI − UTC (seconds) for a UTC instant. (Legacy convenience: does not expose staleness.)
     /// </summary>
-    public static int SecondsBetweenUtcAndTai(System.DateTime utc) => GetOffset(utc).OffsetSeconds;
+    public static int SecondsBetweenUtcAndTai(DateTime utc) => GetOffset(utc).OffsetSeconds;
 
     /// <summary>
     /// Returns the offset plus staleness metadata; may throw if <see cref="StrictMode"/> is true and stale.
     /// </summary>
-    public static OffsetResult GetOffset(System.DateTime utc)
+    public static OffsetResult GetOffset(DateTime utc)
     {
         var (offset, stale) = ComputeOffsetAndStale(utc);
         if (stale && StrictMode)
@@ -79,15 +80,22 @@ public static class LeapSeconds
     }
 
     /// <summary>True if the supplied instant exceeds the staleness horizon.</summary>
-    public static bool IsStale(System.DateTime utc) => ComputeOffsetAndStale(utc).IsStale;
+    public static bool IsStale(DateTime utc) => ComputeOffsetAndStale(utc).IsStale;
 
-    private static OffsetResult ComputeOffsetAndStale(System.DateTime utc)
+    private static OffsetResult ComputeOffsetAndStale(DateTime utc)
     {
-        var horizon = LastSupportedInstantUtc.AddYears(StalenessHorizonYears);
+        // Use the latest change instant between the currently-registered provider and the built-in snapshot
+        // so that temporary swaps to smaller test providers do not incorrectly mark otherwise-supported
+        // instants as stale, while still allowing a freshly-reloaded provider with a newer table to
+        // extend the horizon.
+        var currentLast = TimeProviders.LeapSeconds.LastChangeUtc;
+        var builtInLast = new BuiltInLeapSecondProvider().LastChangeUtc;
+        var lastSupported = currentLast > builtInLast ? currentLast : builtInLast;
+        var horizon = lastSupported.AddYears(StalenessHorizonYears);
         var stale = utc > horizon;
         // Delegate to current provider; fall back to legacy table if provider is built-in.
         var provider = TimeProviders.LeapSeconds;
-        (int offsetSeconds, System.DateTime _) = provider.GetOffset(utc);
+        (int offsetSeconds, DateTime _) = provider.GetOffset(utc);
         return new OffsetResult(offsetSeconds, stale);
     }
 }

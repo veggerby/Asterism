@@ -1,15 +1,10 @@
-using System;
-using System.IO;
-
-using Asterism.Time;
 using Asterism.Time.Providers;
 
 using AwesomeAssertions;
 
-using Xunit;
-
 namespace Asterism.Time.Tests;
 
+[Collection("LeapSecondState")]
 public class LeapSecondReloadTests
 {
     [Fact]
@@ -20,7 +15,7 @@ public class LeapSecondReloadTests
         File.WriteAllText(tmp, "# test\n2017-01-01T00:00:00Z,37\n2020-01-01T00:00:00Z,38\n");
         var prev = TimeProviders.LeapSeconds;
         var prevLogger = TimeProviders.Logger;
-        var testLogger = new Asterism.Time.Tests.Infrastructure.FakeLogger();
+        var testLogger = new Infrastructure.FakeLogger();
         TimeProviders.SetLogger(testLogger);
 
         try

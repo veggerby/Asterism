@@ -5,9 +5,9 @@ namespace Asterism.Time;
 /// </summary>
 /// <remarks>
 /// Used by <see cref="Providers.LeapSecondFileProvider"/> to distinguish semantic ordering / duplication issues
-/// from raw <see cref="System.FormatException"/> parse failures.
+/// from raw <see cref="FormatException"/> parse failures.
 /// </remarks>
-public sealed class LeapSecondCsvException : System.Exception
+public sealed class LeapSecondCsvException : Exception
 {
     /// <summary>Line number in the CSV file where the validation error occurred.</summary>
     public int LineNumber { get; }

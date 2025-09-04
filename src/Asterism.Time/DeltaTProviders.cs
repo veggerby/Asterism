@@ -14,7 +14,7 @@ public static class DeltaTProviders
     private sealed class PolynomialIAU2000 : IDeltaTProvider
     {
         /// <inheritdoc />
-        public double DeltaTSeconds(System.DateTime utc)
+        public double DeltaTSeconds(DateTime utc)
         {
             // Simple piecewise poly (starter); replace with table+poly hybrid in 0.2
             double y = utc.Year + (utc.DayOfYear - 0.5) / 365.25;

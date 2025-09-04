@@ -11,5 +11,5 @@ public interface IDeltaTProvider
     /// </summary>
     /// <param name="utc">UTC date/time for which to compute ΔT.</param>
     /// <returns>ΔT seconds.</returns>
-    double DeltaTSeconds(System.DateTime utc);
+    double DeltaTSeconds(DateTime utc);
 }

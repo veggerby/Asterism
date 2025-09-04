@@ -1,11 +1,6 @@
-using System;
-
-using Asterism.Time;
 using Asterism.Time.Providers;
 
 using AwesomeAssertions;
-
-using Xunit;
 
 namespace Asterism.Time.Tests;
 
@@ -75,25 +70,37 @@ public class HistoricalDeltaTProviderTests
     {
         // arrange
         var dt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-        var instant = AstroInstant.FromUtc(dt);
-        var prev = TimeProviders.DeltaT;
+        var prevLeap = TimeProviders.LeapSeconds;
+        var tmp = System.IO.Path.GetTempFileName();
+        System.IO.File.WriteAllText(tmp, "1972-07-01T00:00:00Z,11\n1973-01-01T00:00:00Z,12\n1974-01-01T00:00:00Z,13\n1975-01-01T00:00:00Z,14\n1976-01-01T00:00:00Z,15\n1977-01-01T00:00:00Z,16\n1978-01-01T00:00:00Z,17\n1979-01-01T00:00:00Z,18\n1980-01-01T00:00:00Z,19\n1981-07-01T00:00:00Z,20\n1982-07-01T00:00:00Z,21\n1983-07-01T00:00:00Z,22\n1985-07-01T00:00:00Z,23\n1988-01-01T00:00:00Z,24\n1990-01-01T00:00:00Z,25\n1991-01-01T00:00:00Z,26\n1992-07-01T00:00:00Z,27\n1993-07-01T00:00:00Z,28\n1994-07-01T00:00:00Z,29\n1996-01-01T00:00:00Z,30\n1997-07-01T00:00:00Z,31\n1999-01-01T00:00:00Z,32\n2006-01-01T00:00:00Z,33\n2009-01-01T00:00:00Z,34\n2012-07-01T00:00:00Z,35\n2015-07-01T00:00:00Z,36\n2017-01-01T00:00:00Z,37\n");
         try
         {
-            TimeProviders.SetDeltaT(_hybrid);
+            TimeProviders.SetLeapSeconds(new LeapSecondFileProvider(tmp));
+            var instant = AstroInstant.FromUtc(dt);
+            var prev = TimeProviders.DeltaT;
+            try
+            {
+                TimeProviders.SetDeltaT(_hybrid);
 
-            // act
-            var jdTt = instant.ToJulianDay(TimeScale.TT);
-            var jdTdb = instant.ToJulianDay(TimeScale.TDB);
-            var deltaT = _hybrid.DeltaTSeconds(dt);
+                // act
+                var jdTt = instant.ToJulianDay(TimeScale.TT);
+                var jdTdb = instant.ToJulianDay(TimeScale.TDB);
+                var deltaT = _hybrid.DeltaTSeconds(dt);
 
-            // assert: ΔT ~ 70-75 s near mid 2020s using coarse projection
-            deltaT.Should().BeInRange(69, 80);
-            // TDB should differ from TT by millisecond-scale periodic terms
-            ((jdTdb.Value - jdTt.Value) * 86400.0).Should().BeInRange(-0.01, 0.01);
+                // assert: ΔT ~ 70-75 s near mid 2020s using coarse projection
+                deltaT.Should().BeInRange(69, 80);
+                // TDB should differ from TT by millisecond-scale periodic terms
+                ((jdTdb.Value - jdTt.Value) * 86400.0).Should().BeInRange(-0.01, 0.01);
+            }
+            finally
+            {
+                TimeProviders.SetDeltaT(prev);
+            }
         }
         finally
         {
-            TimeProviders.SetDeltaT(prev);
+            TimeProviders.SetLeapSeconds(prevLeap);
+            System.IO.File.Delete(tmp);
         }
     }
 }

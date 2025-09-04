@@ -12,9 +12,9 @@ public readonly record struct JulianDay(double Value)
     /// Computes the Julian Day (UTC-based) from a UTC <c>DateTime</c>.
     /// The conversion follows the standard Gregorian-to-JD algorithm using the .NET tick count.
     /// </summary>
-    /// <param name="utc">A UTC <see cref="System.DateTime"/> (kind must represent UTC).</param>
+    /// <param name="utc">A UTC <see cref="DateTime"/> (kind must represent UTC).</param>
     /// <returns>Julian Day representing the supplied UTC instant.</returns>
-    public static JulianDay FromDateTimeUtc(System.DateTime utc)
+    public static JulianDay FromDateTimeUtc(DateTime utc)
     {
         return new(utc.ToUniversalTime().Ticks / 864000000000.0 + 1721425.5);
     }

@@ -6,16 +6,16 @@ namespace Asterism.Time;
 /// Represents an instant in time expressed in UTC, with convenience conversion to Julian Day in various time scales.
 /// All internal storage and inputs are normalized to UTC.
 /// </summary>
-/// <param name="Utc">The UTC <see cref="System.DateTime"/> of the instant.</param>
-public readonly record struct AstroInstant(System.DateTime Utc)
+/// <param name="Utc">The UTC <see cref="DateTime"/> of the instant.</param>
+public readonly record struct AstroInstant(DateTime Utc)
 {
     /// <summary>
-    /// Creates an <see cref="AstroInstant"/> from a UTC <see cref="System.DateTime"/>. The value is converted to universal time if needed.
+    /// Creates an <see cref="AstroInstant"/> from a UTC <see cref="DateTime"/>. The value is converted to universal time if needed.
     /// </summary>
     /// <param name="utc">Input date-time (kind may be local/unspecified; will be converted to UTC).</param>
     /// <returns>Normalized <see cref="AstroInstant"/> representing the supplied UTC instant.</returns>
     /// <exception cref="UnsupportedTimeInstantException">Thrown when leap second data is stale in strict mode.</exception>
-    public static AstroInstant FromUtc(System.DateTime utc)
+    public static AstroInstant FromUtc(DateTime utc)
     {
         var normalized = AsUtc(utc);
         if (LeapSeconds.StrictMode && LeapSeconds.IsStale(normalized))
@@ -27,7 +27,7 @@ public readonly record struct AstroInstant(System.DateTime Utc)
         return new(normalized);
     }
 
-    private static System.DateTime AsUtc(System.DateTime dt)
+    private static DateTime AsUtc(DateTime dt)
     {
         return dt.Kind == System.DateTimeKind.Utc ? dt : dt.ToUniversalTime();
     }

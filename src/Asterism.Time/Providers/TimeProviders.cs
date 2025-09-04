@@ -13,9 +13,9 @@ public static class TimeProviders
     private static volatile ILeapSecondProvider _leapSeconds = new BuiltInLeapSecondProvider();
     private static volatile IDeltaTProvider _deltaT = new DeltaTBlendedProvider();
     private static volatile IEopProvider _eop = new EopNoneProvider();
-    private static volatile Asterism.Time.Tdb.ITdbCorrectionProvider _tdb = new Asterism.Time.Tdb.SimpleTdbProvider();
-    private static volatile Asterism.Time.Diagnostics.IAsterismTimeMetrics _metrics = Asterism.Time.Diagnostics.NoopMetrics.Instance;
-    private static volatile Asterism.Time.Diagnostics.IAsterismTimeLogger _logger = Asterism.Time.Diagnostics.NoopLogger.Instance;
+    private static volatile Tdb.ITdbCorrectionProvider _tdb = new Tdb.SimpleTdbProvider();
+    private static volatile Diagnostics.IAsterismTimeMetrics _metrics = Asterism.Time.Diagnostics.NoopMetrics.Instance;
+    private static volatile Diagnostics.IAsterismTimeLogger _logger = Asterism.Time.Diagnostics.NoopLogger.Instance;
 
     /// <summary>Current leap-second provider (defaults to built-in static table snapshot).</summary>
     public static ILeapSecondProvider LeapSeconds => _leapSeconds;
@@ -26,11 +26,11 @@ public static class TimeProviders
     /// <summary>Current EOP provider (ΔUT1) for UT1 / sidereal computations (defaults to none).</summary>
     public static IEopProvider Eop => _eop;
     /// <summary>Current provider for TDB−TT relativistic correction.</summary>
-    public static Asterism.Time.Tdb.ITdbCorrectionProvider Tdb => _tdb;
+    public static Tdb.ITdbCorrectionProvider Tdb => _tdb;
     /// <summary>Metrics sink (defaults to no-op).</summary>
-    public static Asterism.Time.Diagnostics.IAsterismTimeMetrics Metrics => _metrics;
+    public static Diagnostics.IAsterismTimeMetrics Metrics => _metrics;
     /// <summary>Logger sink (defaults to no-op).</summary>
-    public static Asterism.Time.Diagnostics.IAsterismTimeLogger Logger => _logger;
+    public static Diagnostics.IAsterismTimeLogger Logger => _logger;
 
     /// <summary>
     /// Atomically replaces the leap-second provider.
@@ -85,7 +85,7 @@ public static class TimeProviders
     /// </summary>
     /// <param name="provider">New provider (not null).</param>
     /// <returns>Previous provider.</returns>
-    public static Asterism.Time.Tdb.ITdbCorrectionProvider SetTdb(Asterism.Time.Tdb.ITdbCorrectionProvider provider)
+    public static Tdb.ITdbCorrectionProvider SetTdb(Tdb.ITdbCorrectionProvider provider)
     {
         if (provider is null)
         {
@@ -95,14 +95,14 @@ public static class TimeProviders
     }
 
     /// <summary>Sets metrics sink.</summary>
-    public static Asterism.Time.Diagnostics.IAsterismTimeMetrics SetMetrics(Asterism.Time.Diagnostics.IAsterismTimeMetrics metrics)
+    public static Diagnostics.IAsterismTimeMetrics SetMetrics(Diagnostics.IAsterismTimeMetrics metrics)
     {
         if (metrics is null) { throw new ArgumentNullException(nameof(metrics)); }
         return Interlocked.Exchange(ref _metrics, metrics);
     }
 
     /// <summary>Sets logger sink.</summary>
-    public static Asterism.Time.Diagnostics.IAsterismTimeLogger SetLogger(Asterism.Time.Diagnostics.IAsterismTimeLogger logger)
+    public static Diagnostics.IAsterismTimeLogger SetLogger(Diagnostics.IAsterismTimeLogger logger)
     {
         if (logger is null) { throw new ArgumentNullException(nameof(logger)); }
         return Interlocked.Exchange(ref _logger, logger);
@@ -114,8 +114,8 @@ public static class TimeProviders
     /// <param name="path">Path to leap second CSV (see <see cref="LeapSecondFileProvider"/> remarks for schema).</param>
     /// <returns>The previously registered leap second provider.</returns>
     /// <exception cref="ArgumentException">If <paramref name="path"/> is null/empty.</exception>
-    /// <exception cref="System.IO.IOException">If the file cannot be read.</exception>
-    /// <exception cref="System.FormatException">If CSV parsing fails.</exception>
+    /// <exception cref="IOException">If the file cannot be read.</exception>
+    /// <exception cref="FormatException">If CSV parsing fails.</exception>
     public static ILeapSecondProvider ReloadLeapSecondsFromFile(string path)
     {
         var provider = new LeapSecondFileProvider(path);

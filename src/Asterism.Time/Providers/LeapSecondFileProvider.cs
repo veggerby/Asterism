@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
-
-using Asterism.Time;
 
 namespace Asterism.Time.Providers;
 
@@ -67,6 +62,12 @@ public sealed class LeapSecondFileProvider : ILeapSecondProvider
             }
             offset = entry.taiMinusUtc;
         }
+        // Emit internal metric for leap-second provider hit to match built-in provider behavior.
+        try
+        {
+            TimeProviders.Metrics.IncrementLeapSecondHit();
+        }
+        catch { }
         return (offset, LastChangeUtc);
     }
 
