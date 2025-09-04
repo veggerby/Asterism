@@ -3,6 +3,7 @@ namespace Asterism.Benchmarks;
 using System;
 
 using Asterism.Time;
+using Asterism.Time.Providers;
 
 using BenchmarkDotNet.Attributes;
 
@@ -11,6 +12,8 @@ public class TimeBench
 {
     private readonly AstroInstant[] _instants;
     private int _idx;
+    private readonly IDeltaTProvider _deltaTBlended = new DeltaTBlendedProvider();
+    private readonly IDeltaTProvider _deltaTHybrid = new HybridHistoricalDeltaTProvider();
 
     public TimeBench()
     {
@@ -55,5 +58,41 @@ public class TimeBench
             sum += LeapSeconds.SecondsBetweenUtcAndTai(inst.Utc);
         }
         return sum;
+    }
+
+    [Benchmark]
+    public double DeltaT_Blended_Lookup()
+    {
+        double sum = 0;
+        for (int i = 0; i < 200; i++)
+        {
+            var inst = NextInstant();
+            sum += _deltaTBlended.DeltaTSeconds(inst.Utc);
+        }
+        return sum;
+    }
+
+    [Benchmark]
+    public double DeltaT_Hybrid_Lookup()
+    {
+        double sum = 0;
+        for (int i = 0; i < 200; i++)
+        {
+            var inst = NextInstant();
+            sum += _deltaTHybrid.DeltaTSeconds(inst.Utc);
+        }
+        return sum;
+    }
+
+    [Benchmark]
+    public double Full_UTC_To_TDB_Pipeline()
+    {
+        double acc = 0;
+        for (int i = 0; i < 50; i++)
+        {
+            var inst = NextInstant();
+            acc += inst.ToJulianDay(TimeScale.TDB).Value;
+        }
+        return acc;
     }
 }

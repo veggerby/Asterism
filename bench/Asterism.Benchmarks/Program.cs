@@ -1,3 +1,9 @@
-﻿using BenchmarkDotNet.Running;
+﻿using Asterism.Benchmarks;
 
-BenchmarkRunner.Run<Asterism.Benchmarks.TimeBench>();
+using BenchmarkDotNet.Running;
+
+BenchmarkRunner.Run(new[]
+{
+    BenchmarkConverter.TypeToBenchmarks(typeof(TimeBench)),
+    BenchmarkConverter.TypeToBenchmarks(typeof(TdbBench))
+});
