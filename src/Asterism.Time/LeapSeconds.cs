@@ -16,10 +16,30 @@ public static class LeapSeconds
     public static System.DateTime LastSupportedInstantUtc => TimeProviders.LeapSeconds.LastChangeUtc;
 
     /// <summary>Configurable staleness horizon in years beyond <see cref="LastSupportedInstantUtc"/> (default 15 to cover current gap since 2017).</summary>
-    public static int StalenessHorizonYears { get; set; } = 15;
+    private static int _stalenessHorizonYears = 15;
+    /// <summary>Configurable staleness horizon in years beyond <see cref="LastSupportedInstantUtc"/> (default 15 to cover current gap since 2017). Must be between 1 and 100 inclusive.</summary>
+    public static int StalenessHorizonYears
+    {
+        get => _stalenessHorizonYears;
+        set
+        {
+            if (value < 1 || value > 100)
+            {
+                throw new System.ArgumentOutOfRangeException(nameof(value), value, "Horizon years must be between 1 and 100.");
+            }
+            _stalenessHorizonYears = value;
+        }
+    }
 
     /// <summary>When true, stale instants cause <see cref="UnsupportedTimeInstantException"/> to be thrown (can be toggled at runtime).</summary>
     public static bool StrictMode { get; set; } = ReadStrictModeFromEnvironment();
+
+    /// <summary>Re-reads the strict mode environment variable and applies it. Returns the new value.</summary>
+    public static bool ReloadStrictModeFromEnvironment()
+    {
+        StrictMode = ReadStrictModeFromEnvironment();
+        return StrictMode;
+    }
 
     private static bool ReadStrictModeFromEnvironment()
     {

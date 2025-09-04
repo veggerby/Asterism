@@ -66,7 +66,7 @@ public class LeapSecondFileProviderErrorTests
             "1972-01-01T00:00:00Z,10" // earlier than first
         );
         Action act = () => new LeapSecondFileProvider(path);
-        act.Should().Throw<FormatException>();
+        act.Should().Throw<LeapSecondCsvException>();
     }
 
     [Fact]
@@ -77,6 +77,6 @@ public class LeapSecondFileProviderErrorTests
             "1972-07-01T00:00:00Z,11"
         );
         Action act = () => new LeapSecondFileProvider(path);
-        act.Should().Throw<FormatException>();
+        act.Should().Throw<LeapSecondCsvException>();
     }
 }

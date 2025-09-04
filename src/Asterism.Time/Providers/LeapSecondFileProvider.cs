@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 
+using Asterism.Time;
+
 namespace Asterism.Time.Providers;
 
 /// <summary>
@@ -98,9 +100,16 @@ public sealed class LeapSecondFileProvider : ILeapSecondProvider
             {
                 throw new FormatException($"Line {lineNo}: invalid integer offset '{parts[1]}'");
             }
-            if (prev.HasValue && ts <= prev.Value)
+            if (prev.HasValue)
             {
-                throw new FormatException($"Line {lineNo}: timestamps not strictly ascending");
+                if (ts < prev.Value)
+                {
+                    throw new LeapSecondCsvException(lineNo, "timestamp out of order (must be strictly ascending)");
+                }
+                if (ts == prev.Value)
+                {
+                    throw new LeapSecondCsvException(lineNo, "duplicate timestamp");
+                }
             }
             prev = ts;
             list.Add((ts, offset));
