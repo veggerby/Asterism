@@ -16,6 +16,8 @@ public class SiderealTimeEopProviderTests
         private readonly double _deltaUt1;
         public FixedEopProvider(double deltaUt1Seconds) { _deltaUt1 = deltaUt1Seconds; }
         public double? GetDeltaUt1(DateTime utc) => _deltaUt1;
+        public PolarMotion? GetPolarMotion(DateTime utc) => null;
+        public CipOffsets? GetCipOffsets(DateTime utc) => null;
         public DateTime DataEpochUtc => DateTime.MinValue;
         public string Source => "Fixed";
     }

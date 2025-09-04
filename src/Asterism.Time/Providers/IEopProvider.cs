@@ -9,8 +9,13 @@ public interface IEopProvider
     /// <summary>
     /// Returns ΔUT1 (UT1 − UTC) in seconds for the supplied UTC instant, or null if unknown.
     /// </summary>
-    /// <param name="utc">UTC instant.</param>
     double? GetDeltaUt1(System.DateTime utc);
+
+    /// <summary>Returns polar motion (x_p, y_p) in arcseconds for the supplied UTC instant (null if unavailable).</summary>
+    PolarMotion? GetPolarMotion(System.DateTime utc);
+
+    /// <summary>Returns celestial intermediate pole offsets (dX, dY) in arcseconds for the supplied UTC instant (null if unavailable).</summary>
+    CipOffsets? GetCipOffsets(System.DateTime utc);
 
     /// <summary>UTC instant representing when the underlying data set was last updated / is valid through.</summary>
     System.DateTime DataEpochUtc { get; }

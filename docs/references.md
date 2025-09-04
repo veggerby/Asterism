@@ -97,7 +97,7 @@ Transformations involve:
 
 - **Leap Seconds** — ship a frozen snapshot, update with new releases.
 - **ΔT** — blended sparse table + interpolation, mild extrapolation; future: ingest published tables.
-- **EOP** (optional, Ultra profile) — UT1–UTC, polar motion, dX/dY (from IERS Bulletin A).
+- **EOP** (optional, Ultra profile) — UT1–UTC, polar motion (x_p,y_p), CIP offsets (dX,dY) (from IERS Bulletin A). Accessed via grouped structs `PolarMotion` and `CipOffsets`.
 
 ---
 

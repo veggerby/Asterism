@@ -9,6 +9,13 @@ Aggregated notable changes across all Asterism packages. For per-package details
 
 ### Added
 
+- Leap second CSV structural validation (duplicate / out-of-order detection) with specific `LeapSecondCsvException`.
+- Configurable leap second staleness strict mode via environment variable and validated horizon range (1–100 days).
+- Historical ΔT empirical data provider and hybrid provider extending accuracy for pre-1972 epochs while preserving forward continuity.
+- Extended Earth Orientation Parameters support: grouped structs `PolarMotion` and `CipOffsets` exposed via `IEopProvider`.
+- `CsvEopProvider` now accepts minimal (2-column: MJD, DUT1) or extended (6-column: MJD, DUT1, x_p, y_p, dX, dY) CSV schemas.
+- Benchmarks expanded (ΔT lookup, UTC→TDB pipeline) for performance tracking.
+- Concurrency stress tests for provider hot-swapping and time conversions.
 - Asterism.Time: leap-second staleness policy (`LeapSeconds.IsStale`) and strict mode toggle (env `ASTERISM_TIME_STRICT_LEAP_SECONDS`).
 - Asterism.Time: configurable `LeapSeconds.StalenessHorizonYears` (default now 15) and structured `LeapSeconds.GetOffset` returning `(offset, stale)`.
 - Asterism.Time: pluggable provider infrastructure (`TimeProviders.Set*`) for Leap Seconds, ΔT, EOP (ΔUT1), and TDB periodic corrections.
@@ -20,11 +27,17 @@ Aggregated notable changes across all Asterism packages. For per-package details
 
 ### Changed
 
+- Refactored EOP API from individual scalar accessors to grouped optional structs to reduce call overhead and clarify atomicity.
 - Asterism.Time: default staleness horizon increased from 10 to 15 years to cover current gap since last leap second (2017) without marking present-day instants stale.
 - README: expanded provider cookbook and clarified leap-second staleness semantics.
 
+### Fixed
+
+- Improved cancellation handling and determinism in concurrency stress tests.
+
 ### Internal / Maintenance
 
+- Documentation (README, references) updated for extended EOP schema and grouped struct API.
 - Migrated all tests to AwesomeAssertions fluent `Should()` style (removed temporary facade) for consistency and expressiveness.
 - Ensured deterministic, parallel-safe tests by isolating global state altering cases via xUnit collection.
 

@@ -30,11 +30,13 @@ public class ConcurrencyStressTests
         // arrange
         var cts = new CancellationTokenSource(TimeSpan.FromSeconds(3));
         var errors = new ConcurrentBag<Exception>();
+        var baselineLeap = TimeProviders.LeapSeconds; // existing public provider
+
         var swapTask = Task.Run(() =>
         {
             var altTdb = new MeeusTdbProvider();
-            var altDelta = new DeltaTBlendedProvider();
-            var altLeap = new BuiltInLeapSecondProvider();
+            var altDelta = new DeltaTBlendedProvider(); // unchanged by EOP refactor
+            var altLeap = baselineLeap; // reuse baseline to exercise exchange
             while (!cts.IsCancellationRequested)
             {
                 try
@@ -59,7 +61,7 @@ public class ConcurrencyStressTests
                 {
                     var dt = RandomDate(rand);
                     var inst = AstroInstant.FromUtc(dt);
-                    _ = inst.ToJulianDay(TimeScale.TDB);
+                    inst.ToJulianDay(TimeScale.TDB);
                 }
                 catch (Exception ex)
                 {
@@ -69,8 +71,11 @@ public class ConcurrencyStressTests
         }, cts.Token)).ToArray();
 
         // act
-        await Task.WhenAll(Task.WhenAny(Task.Delay(cts.Token), swapTask), Task.WhenAll(lookupTasks));
+        // Run for allotted time (not passing token so we control cancellation explicitly)
+        await Task.Delay(TimeSpan.FromSeconds(2.5));
         cts.Cancel();
+        try { await Task.WhenAll(lookupTasks); } catch (TaskCanceledException) { }
+        try { await swapTask; } catch (TaskCanceledException) { }
 
         // assert
         errors.Should().BeEmpty();

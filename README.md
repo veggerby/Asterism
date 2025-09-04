@@ -122,7 +122,7 @@ using Asterism.Time;
 
 TimeProviders.SetLeapSeconds(new LeapSecondFileProvider("leap_seconds.csv"));
 TimeProviders.SetDeltaT(new DeltaTBlendedProvider());
-TimeProviders.SetEop(new EopNoneProvider()); // or new CsvEopProvider("dut1.csv") when you have daily ΔUT1
+TimeProviders.SetEop(new EopNoneProvider()); // or new CsvEopProvider("eop.csv") when you have daily EOP (ΔUT1, polar motion, CIP)
 TimeProviders.SetTdb(new SimpleTdbProvider()); // or new MeeusTdbProvider() for expanded periodic series
 ```
 
@@ -139,12 +139,28 @@ Leap second CSV schema:
 
 Update the package (or supply a custom provider) to refresh data when new leap seconds are announced.
 
-Daily ΔUT1 CSV schema (EOP):
+Daily EOP CSV schema (minimal):
 
 ```text
 # date,dut1_seconds
 2025-01-01,0.114843
 2025-01-02,0.115004
+```
+
+Extended schema (adds polar motion and CIP offsets; blank/missing trailing fields treated as null):
+
+```text
+# date,dut1_seconds,x_p_arcsec,y_p_arcsec,dX_arcsec,dY_arcsec
+2025-01-01,0.114843,0.03412,0.27651,0.00012,-0.00009
+```
+
+API access (grouped structs):
+
+```csharp
+var dut1 = provider.GetDeltaUt1(utc);
+var pm = provider.GetPolarMotion(utc); // PolarMotion? with XPArcsec, YPArcsec
+var cip = provider.GetCipOffsets(utc); // CipOffsets? with DXArcsec, DYArcsec
+```
 ```
 
 Reload leap seconds or EOP at runtime (atomic hot-swap):
