@@ -113,8 +113,7 @@ jobs:
           fi
           mkdir -p "$NUGET_PACK_DIR"
           for proj in \
-            src/Asterism.Time/Asterism.Time.csproj \
-            src/Asterism.Coordinates/Asterism.Coordinates.csproj; do
+            src/Asterism.Time/Asterism.Time.csproj ; do
               echo "Packing $proj"
               dotnet pack "$proj" --configuration Release --no-build --output "$NUGET_PACK_DIR" /p:Version=${{ steps.gitversion.outputs.nuGetVersionV2 }}$VERSION_SUFFIX $RELEASE_NOTES_ARG
           done
