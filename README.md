@@ -111,11 +111,11 @@ dotnet run -c Release -p bench/Asterism.Benchmarks
 - Planned: hybrid ΔT (historical table + polynomial extrapolation)
 - All transforms validated against [IAU SOFA](https://www.iausofa.org/) reference algorithms
 
-**Leap seconds & staleness:** The bundled leap-second table currently ends at 2017-01-01 (TAI−UTC = 37s). By default, future instants reuse the last known offset and are marked as *stale* (you can query staleness through the API). Enable strict mode (set environment variable `ASTERISM_TIME_STRICT_LEAP_SECONDS=true` or toggle `LeapSeconds.StrictMode`) to throw instead when an instant lies beyond the configurable horizon (default 10 years past the last table entry).
+**Leap seconds & staleness:** The bundled leap-second table currently ends at 2017-01-01 (TAI−UTC = 37s). By default, future instants reuse the last known offset and are marked as *stale* (query via `LeapSeconds.IsStale` or `LeapSeconds.GetOffset`). Enable strict mode (set env `ASTERISM_TIME_STRICT_LEAP_SECONDS=true` or toggle `LeapSeconds.StrictMode`) to throw instead when an instant lies beyond the configurable horizon (default 15 years past the last table entry).
 
 ### Provider cookbook
 
-You can swap data providers at application startup (atomic publication helpers provided):
+You can swap data providers at application startup (atomic publication helpers provided). All `Set*` operations use `Interlocked.Exchange` for thread-safety:
 
 ```csharp
 using Asterism.Time;
@@ -147,7 +147,7 @@ Daily ΔUT1 CSV schema (EOP):
 2025-01-02,0.115004
 ```
 
-Reload leap seconds or EOP at runtime (atomic):
+Reload leap seconds or EOP at runtime (atomic hot-swap):
 
 ```csharp
 TimeProviders.ReloadLeapSecondsFromFile("leap_seconds.csv");
@@ -160,7 +160,7 @@ TimeProviders.SetTdb(new MeeusTdbProvider());
 ## 📅 Roadmap
 
 - [x] v0.1 — UTC/TAI/TT/TDB; JD/MJD; leap-seconds; Equatorial→Horizontal
-- [ ] v0.2 — IAU 2006 precession + IAU 2000A nutation; better sidereal
+- [ ] v0.2 — IAU 2006 precession + IAU 2000A nutation; improved sidereal & ERA
 - [ ] v0.3 — Ecliptic & Galactic frames; proper motion & parallax
 - [ ] v0.4 — Aberration, advanced refraction, EOP ingestion
 
