@@ -15,4 +15,7 @@ public interface ILeapSecondProvider
 
     /// <summary>Human-readable source description (e.g., "Built-in 2017-01-01 snapshot" or file path/URL).</summary>
     string Source { get; }
+
+    /// <summary>Opaque data version string (e.g., file hash, embedded snapshot id).</summary>
+    string DataVersion { get; }
 }

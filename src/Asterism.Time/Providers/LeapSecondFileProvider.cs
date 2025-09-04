@@ -49,6 +49,8 @@ public sealed class LeapSecondFileProvider : ILeapSecondProvider
     public DateTime LastChangeUtc => _table[^1].utc;
     /// <inheritdoc />
     public string Source => _source;
+    /// <inheritdoc />
+    public string DataVersion => LastChangeUtc.ToString("yyyy-MM-dd");
 
     /// <inheritdoc />
     public (int taiMinusUtcSeconds, DateTime lastChangeUtc) GetOffset(DateTime utc)

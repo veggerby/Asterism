@@ -37,6 +37,7 @@ public sealed class DeltaTBlendedProvider : IDeltaTProvider
     /// <inheritdoc />
     public double DeltaTSeconds(DateTime utc)
     {
+        TimeProviders.Metrics.IncrementDeltaTHit();
         var y = DecimalYear(utc);
         var a = Anchors;
         if (y <= a[0].year)

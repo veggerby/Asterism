@@ -20,6 +20,7 @@ public class SiderealTimeEopProviderTests
         public CipOffsets? GetCipOffsets(DateTime utc) => null;
         public DateTime DataEpochUtc => DateTime.MinValue;
         public string Source => "Fixed";
+        public string DataVersion => "test";
     }
 
     [Fact]

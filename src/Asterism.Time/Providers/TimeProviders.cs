@@ -14,6 +14,8 @@ public static class TimeProviders
     private static volatile IDeltaTProvider _deltaT = new DeltaTBlendedProvider();
     private static volatile IEopProvider _eop = new EopNoneProvider();
     private static volatile Asterism.Time.Tdb.ITdbCorrectionProvider _tdb = new Asterism.Time.Tdb.SimpleTdbProvider();
+    private static volatile Asterism.Time.Diagnostics.IAsterismTimeMetrics _metrics = Asterism.Time.Diagnostics.NoopMetrics.Instance;
+    private static volatile Asterism.Time.Diagnostics.IAsterismTimeLogger _logger = Asterism.Time.Diagnostics.NoopLogger.Instance;
 
     /// <summary>Current leap-second provider (defaults to built-in static table snapshot).</summary>
     public static ILeapSecondProvider LeapSeconds => _leapSeconds;
@@ -25,6 +27,10 @@ public static class TimeProviders
     public static IEopProvider Eop => _eop;
     /// <summary>Current provider for TDB−TT relativistic correction.</summary>
     public static Asterism.Time.Tdb.ITdbCorrectionProvider Tdb => _tdb;
+    /// <summary>Metrics sink (defaults to no-op).</summary>
+    public static Asterism.Time.Diagnostics.IAsterismTimeMetrics Metrics => _metrics;
+    /// <summary>Logger sink (defaults to no-op).</summary>
+    public static Asterism.Time.Diagnostics.IAsterismTimeLogger Logger => _logger;
 
     /// <summary>
     /// Atomically replaces the leap-second provider.
@@ -88,6 +94,20 @@ public static class TimeProviders
         return Interlocked.Exchange(ref _tdb, provider);
     }
 
+    /// <summary>Sets metrics sink.</summary>
+    public static Asterism.Time.Diagnostics.IAsterismTimeMetrics SetMetrics(Asterism.Time.Diagnostics.IAsterismTimeMetrics metrics)
+    {
+        if (metrics is null) { throw new ArgumentNullException(nameof(metrics)); }
+        return Interlocked.Exchange(ref _metrics, metrics);
+    }
+
+    /// <summary>Sets logger sink.</summary>
+    public static Asterism.Time.Diagnostics.IAsterismTimeLogger SetLogger(Asterism.Time.Diagnostics.IAsterismTimeLogger logger)
+    {
+        if (logger is null) { throw new ArgumentNullException(nameof(logger)); }
+        return Interlocked.Exchange(ref _logger, logger);
+    }
+
     /// <summary>
     /// Loads a leap second CSV file and atomically replaces the current leap second provider.
     /// </summary>
@@ -99,6 +119,12 @@ public static class TimeProviders
     public static ILeapSecondProvider ReloadLeapSecondsFromFile(string path)
     {
         var provider = new LeapSecondFileProvider(path);
-        return SetLeapSeconds(provider);
+        var previous = SetLeapSeconds(provider);
+        try
+        {
+            Logger.LeapSecondReload(provider.Source, true, null);
+        }
+        catch { }
+        return previous;
     }
 }

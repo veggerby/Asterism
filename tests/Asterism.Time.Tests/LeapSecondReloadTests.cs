@@ -19,6 +19,9 @@ public class LeapSecondReloadTests
         var tmp = Path.GetTempFileName();
         File.WriteAllText(tmp, "# test\n2017-01-01T00:00:00Z,37\n2020-01-01T00:00:00Z,38\n");
         var prev = TimeProviders.LeapSeconds;
+        var prevLogger = TimeProviders.Logger;
+        var testLogger = new Asterism.Time.Tests.Infrastructure.FakeLogger();
+        TimeProviders.SetLogger(testLogger);
 
         try
         {
@@ -32,6 +35,7 @@ public class LeapSecondReloadTests
         finally
         {
             TimeProviders.SetLeapSeconds(prev);
+            TimeProviders.SetLogger(prevLogger);
             File.Delete(tmp);
         }
     }

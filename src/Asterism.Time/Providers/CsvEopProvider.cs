@@ -25,6 +25,7 @@ public sealed class CsvEopProvider : IEopProvider
     private readonly Entry[] _entries;
     private readonly DateTime _epoch;
     private readonly string _source;
+    private readonly string _dataVersion;
 
     public CsvEopProvider(string path)
         : this(File.OpenText(path))
@@ -81,12 +82,14 @@ public sealed class CsvEopProvider : IEopProvider
 
         _entries = list.ToArray();
         _epoch = _entries.Length == 0 ? DateTime.MinValue : _entries[^1].Date;
+        _dataVersion = _epoch == DateTime.MinValue ? "empty" : _epoch.ToString("yyyy-MM-dd");
     }
 
     public double? GetDeltaUt1(DateTime utc)
     {
         if (_entries.Length == 0)
         {
+            TimeProviders.Metrics.IncrementEopMiss();
             return null;
         }
 
@@ -100,12 +103,14 @@ public sealed class CsvEopProvider : IEopProvider
 
             if (cmp == 0)
             {
+                TimeProviders.Metrics.IncrementEopHit();
                 return _entries[mid].Dut1Seconds;
             }
 
             if (cmp < 0) { lo = mid + 1; } else { hi = mid - 1; }
         }
 
+        TimeProviders.Metrics.IncrementEopMiss();
         return null; // out of range triggers UTC fallback
     }
 
@@ -125,6 +130,7 @@ public sealed class CsvEopProvider : IEopProvider
 
     public DateTime DataEpochUtc => _epoch;
     public string Source => _source;
+    public string DataVersion => _dataVersion;
     private Entry? Find(DateTime date)
     {
         if (_entries.Length == 0)

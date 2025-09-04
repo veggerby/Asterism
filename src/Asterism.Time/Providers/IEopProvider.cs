@@ -22,4 +22,7 @@ public interface IEopProvider
 
     /// <summary>Human readable source label (file path, URL, or descriptor).</summary>
     string Source { get; }
+
+    /// <summary>Opaque data version (e.g., last modified date, sequence id).</summary>
+    string DataVersion { get; }
 }

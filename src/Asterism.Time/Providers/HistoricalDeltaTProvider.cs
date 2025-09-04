@@ -61,6 +61,7 @@ public sealed class HistoricalDeltaTProvider : IDeltaTProvider
     /// <inheritdoc />
     public double DeltaTSeconds(DateTime utc)
     {
+        TimeProviders.Metrics.IncrementDeltaTHit();
         double y = utc.Year + (utc.DayOfYear - 0.5) / 365.25; // decimal year
         var t = Table;
         if (y <= t[0].year)
@@ -97,6 +98,7 @@ public sealed class HybridHistoricalDeltaTProvider : IDeltaTProvider
     /// <inheritdoc />
     public double DeltaTSeconds(DateTime utc)
     {
+        TimeProviders.Metrics.IncrementDeltaTHit();
         // Historical table roughly valid up to 2020 anchor; use it for pre-1972 + extended anchors.
         if (utc.Year < 1972)
         {

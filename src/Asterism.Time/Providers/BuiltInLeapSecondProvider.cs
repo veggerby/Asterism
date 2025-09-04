@@ -43,6 +43,7 @@ internal sealed class BuiltInLeapSecondProvider : ILeapSecondProvider
 
     public System.DateTime LastChangeUtc => Table[^1].dateUtc;
     public string Source => "Built-in snapshot (2017-01-01, no changes announced through 2025)";
+    public string DataVersion => "2017-01-01";
 
     public (int taiMinusUtcSeconds, System.DateTime lastChangeUtc) GetOffset(System.DateTime utc)
     {
@@ -56,6 +57,7 @@ internal sealed class BuiltInLeapSecondProvider : ILeapSecondProvider
             }
             offset = entry.total;
         }
+        TimeProviders.Metrics.IncrementLeapSecondHit();
         return (offset, LastChangeUtc);
     }
 }

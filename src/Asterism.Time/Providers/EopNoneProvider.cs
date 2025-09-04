@@ -17,4 +17,5 @@ public sealed class EopNoneProvider : IEopProvider
 
     /// <inheritdoc />
     public string Source => "None";
+    public string DataVersion => "none";
 }
