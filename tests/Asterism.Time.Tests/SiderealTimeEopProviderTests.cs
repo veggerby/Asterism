@@ -3,6 +3,8 @@ using System;
 using Asterism.Time;
 using Asterism.Time.Providers;
 
+using AwesomeAssertions;
+
 using Xunit;
 
 namespace Asterism.Time.Tests;
@@ -42,7 +44,7 @@ public class SiderealTimeEopProviderTests
             if (actualShift > Math.PI) { actualShift -= 2 * Math.PI; }
 
             // assert (allow 20% tolerance due to approximate formula)
-            Assert.InRange(actualShift, expectedShift * 0.8, expectedShift * 1.2);
+            actualShift.Should().BeInRange(expectedShift * 0.8, expectedShift * 1.2);
         }
         finally
         {

@@ -2,6 +2,8 @@ using System;
 
 using Asterism.Time;
 
+using AwesomeAssertions;
+
 using Xunit;
 
 namespace Asterism.Time.Tests;
@@ -19,9 +21,9 @@ public class UnsupportedTimeInstantExceptionTests
         var ex = new UnsupportedTimeInstantException(utc, last);
 
         // assert
-        Assert.Equal(utc, ex.Utc);
-        Assert.Equal(last, ex.LastSupportedUtc);
-        Assert.Contains(utc.ToString("o"), ex.Message);
-        Assert.Contains(last.ToString("o"), ex.Message);
+        ex.Utc.Should().Be(utc);
+        ex.LastSupportedUtc.Should().Be(last);
+        ex.Message.Should().Contain(utc.ToString("o"));
+        ex.Message.Should().Contain(last.ToString("o"));
     }
 }

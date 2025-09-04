@@ -2,6 +2,8 @@ using System;
 
 using Asterism.Time;
 
+using AwesomeAssertions;
+
 using Xunit;
 
 namespace Asterism.Time.Tests;
@@ -27,6 +29,6 @@ public class TdbRangeTests
         }
 
         // assert (expected amplitude ~0.001657 + small second harmonic)
-        Assert.InRange(maxAbs, 0.0015, 0.0018); // generous bounds
+        maxAbs.Should().BeInRange(0.0015, 0.0018);
     }
 }

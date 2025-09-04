@@ -3,6 +3,8 @@ using System;
 using Asterism.Time;
 using Asterism.Time.Providers;
 
+using AwesomeAssertions;
+
 using Xunit;
 
 namespace Asterism.Time.Tests;
@@ -18,17 +20,26 @@ public class DeltaTBlendedProviderTests
     [InlineData(2015, 66, 69)]
     public void AnchorYears_AreWithinExpectedRange(int year, double min, double max)
     {
+        // arrange
         var dt = new DateTime(year, 7, 1, 0, 0, 0, DateTimeKind.Utc);
+
+        // act
         var val = _provider.DeltaTSeconds(dt);
-        Assert.InRange(val, min, max);
+
+        // assert
+        val.Should().BeGreaterThanOrEqualTo(min).And.BeLessThanOrEqualTo(max);
     }
 
     [Fact]
     public void FutureYear_ExtrapolatesReasonably()
     {
+        // arrange
         var dt = new DateTime(2030, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+        // act
         var val = _provider.DeltaTSeconds(dt);
-        // Loose bound: continue gentle rise
-        Assert.InRange(val, 70, 80);
+
+        // assert (Loose bound: continue gentle rise)
+        val.Should().BeInRange(70, 80);
     }
 }

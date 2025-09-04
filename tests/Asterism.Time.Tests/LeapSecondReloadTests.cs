@@ -4,6 +4,8 @@ using System.IO;
 using Asterism.Time;
 using Asterism.Time.Providers;
 
+using AwesomeAssertions;
+
 using Xunit;
 
 namespace Asterism.Time.Tests;
@@ -25,7 +27,7 @@ public class LeapSecondReloadTests
             var last = LeapSeconds.LastSupportedInstantUtc;
 
             // assert
-            Assert.Equal(new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc), last);
+            last.Should().Be(new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc));
         }
         finally
         {

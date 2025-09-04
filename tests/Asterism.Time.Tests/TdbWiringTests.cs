@@ -4,6 +4,8 @@ using Asterism.Time;
 using Asterism.Time.Providers;
 using Asterism.Time.Tdb;
 
+using AwesomeAssertions;
+
 using Xunit;
 
 namespace Asterism.Time.Tests;
@@ -25,8 +27,8 @@ public sealed class TdbWiringTests
             var meeus = new MeeusTdbProvider();
             var c1 = simple.GetTdbMinusTtSeconds(jdTt);
             var c2 = meeus.GetTdbMinusTtSeconds(jdTt);
-            // assert: expanded series differs (may be microseconds; do not rely on JD addition granularity)
-            Assert.NotEqual(c1, c2);
+            // assert
+            c2.Should().NotBe(c1);
         }
         finally
         {

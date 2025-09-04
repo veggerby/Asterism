@@ -2,6 +2,8 @@ using System;
 
 using Asterism.Time;
 
+using AwesomeAssertions;
+
 using Xunit;
 
 namespace Asterism.Time.Tests;
@@ -14,8 +16,9 @@ public class SiderealAndTdbTests
         var utc = new DateTime(2024, 6, 1, 12, 0, 0, DateTimeKind.Utc);
         var era = SiderealTime.EraRadians(utc);
         var gmst = SiderealTime.GmstRadians(utc);
-        Assert.InRange(era, 0, 2 * Math.PI);
-        Assert.InRange(gmst, 0, 2 * Math.PI);
+        // assert
+        era.Should().BeInRange(0, 2 * Math.PI);
+        gmst.Should().BeInRange(0, 2 * Math.PI);
     }
 
     [Fact]
@@ -26,7 +29,7 @@ public class SiderealAndTdbTests
         var jdTt = inst.ToJulianDay(TimeScale.TT).Value;
         var jdTdb = inst.ToJulianDay(TimeScale.TDB).Value;
         var diffSec = (jdTdb - jdTt) * 86400.0;
-        Assert.InRange(Math.Abs(diffSec), 0, 0.005); // ~5 ms bound
+        Math.Abs(diffSec).Should().BeLessThanOrEqualTo(0.005);
     }
 
     [Fact]
@@ -37,7 +40,8 @@ public class SiderealAndTdbTests
         try
         {
             LeapSeconds.StrictMode = true;
-            Assert.Throws<UnsupportedTimeInstantException>(() => AstroInstant.FromUtc(future));
+            Action act = () => AstroInstant.FromUtc(future);
+            act.Should().Throw<UnsupportedTimeInstantException>();
         }
         finally
         {

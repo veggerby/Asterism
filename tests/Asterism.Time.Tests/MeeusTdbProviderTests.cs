@@ -3,6 +3,8 @@ using System;
 using Asterism.Time;
 using Asterism.Time.Tdb;
 
+using AwesomeAssertions;
+
 using Xunit;
 
 namespace Asterism.Time.Tests;
@@ -22,8 +24,8 @@ public sealed class MeeusTdbProviderTests
         var dSimple = simple.GetTdbMinusTtSeconds(jd);
 
         // assert
-        Assert.InRange(dMeeus, -0.005, 0.005);
-        Assert.True(Math.Abs(dMeeus - dSimple) < 0.003);
+        dMeeus.Should().BeInRange(-0.005, 0.005);
+        Math.Abs(dMeeus - dSimple).Should().BeLessThan(0.003);
     }
 
     [Theory]
@@ -42,6 +44,6 @@ public sealed class MeeusTdbProviderTests
         var v1 = meeus.GetTdbMinusTtSeconds(jd1);
 
         // assert
-        Assert.True(Math.Abs(v1 - v0) < 0.003);
+        Math.Abs(v1 - v0).Should().BeLessThan(0.003);
     }
 }

@@ -4,6 +4,8 @@ using System.Text;
 
 using Asterism.Time.Providers;
 
+using AwesomeAssertions;
+
 using Xunit;
 
 namespace Asterism.Time.Tests;
@@ -21,7 +23,8 @@ public class LeapSecondFileProviderErrorTests
     public void EmptyFile_Throws()
     {
         var path = CreateTempFile();
-        Assert.Throws<FormatException>(() => new LeapSecondFileProvider(path));
+        Action act = () => new LeapSecondFileProvider(path);
+        act.Should().Throw<FormatException>();
     }
 
     [Fact]
@@ -31,7 +34,8 @@ public class LeapSecondFileProviderErrorTests
             "# header",
             "1972-07-01T00:00:00Z,11,EXTRA"
         );
-        Assert.Throws<FormatException>(() => new LeapSecondFileProvider(path));
+        Action act = () => new LeapSecondFileProvider(path);
+        act.Should().Throw<FormatException>();
     }
 
     [Fact]
@@ -40,7 +44,8 @@ public class LeapSecondFileProviderErrorTests
         var path = CreateTempFile(
             "1972-13-01T00:00:00Z,11" // invalid month 13
         );
-        Assert.Throws<FormatException>(() => new LeapSecondFileProvider(path));
+        Action act = () => new LeapSecondFileProvider(path);
+        act.Should().Throw<FormatException>();
     }
 
     [Fact]
@@ -49,7 +54,8 @@ public class LeapSecondFileProviderErrorTests
         var path = CreateTempFile(
             "1972-07-01T00:00:00Z,notInt"
         );
-        Assert.Throws<FormatException>(() => new LeapSecondFileProvider(path));
+        Action act = () => new LeapSecondFileProvider(path);
+        act.Should().Throw<FormatException>();
     }
 
     [Fact]
@@ -59,7 +65,8 @@ public class LeapSecondFileProviderErrorTests
             "1972-07-01T00:00:00Z,11",
             "1972-01-01T00:00:00Z,10" // earlier than first
         );
-        Assert.Throws<FormatException>(() => new LeapSecondFileProvider(path));
+        Action act = () => new LeapSecondFileProvider(path);
+        act.Should().Throw<FormatException>();
     }
 
     [Fact]
@@ -69,6 +76,7 @@ public class LeapSecondFileProviderErrorTests
             "1972-07-01T00:00:00Z,11",
             "1972-07-01T00:00:00Z,11"
         );
-        Assert.Throws<FormatException>(() => new LeapSecondFileProvider(path));
+        Action act = () => new LeapSecondFileProvider(path);
+        act.Should().Throw<FormatException>();
     }
 }

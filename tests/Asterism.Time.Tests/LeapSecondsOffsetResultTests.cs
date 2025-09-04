@@ -2,10 +2,13 @@ using System;
 
 using Asterism.Time;
 
+using AwesomeAssertions;
+
 using Xunit;
 
 namespace Asterism.Time.Tests;
 
+[Collection("LeapSecondState")] // serialize StrictMode mutations
 public class LeapSecondsOffsetResultTests
 {
     [Fact]
@@ -30,12 +33,12 @@ public class LeapSecondsOffsetResultTests
             var tupleBeyond = TimeOffsets.SecondsUtcToTaiWithStale(justBeyond);
 
             // assert
-            Assert.False(boundaryResult.IsStale);
-            Assert.True(beyondResult.IsStale);
-            Assert.False(tupleBoundary.isStale);
-            Assert.True(tupleBeyond.isStale);
-            Assert.Equal(boundaryResult.OffsetSeconds, tupleBoundary.offsetSeconds);
-            Assert.Equal(beyondResult.OffsetSeconds, tupleBeyond.offsetSeconds);
+            boundaryResult.IsStale.Should().BeFalse();
+            beyondResult.IsStale.Should().BeTrue();
+            tupleBoundary.isStale.Should().BeFalse();
+            tupleBeyond.isStale.Should().BeTrue();
+            tupleBoundary.offsetSeconds.Should().Be(boundaryResult.OffsetSeconds);
+            tupleBeyond.offsetSeconds.Should().Be(beyondResult.OffsetSeconds);
         }
         finally
         {
@@ -60,9 +63,9 @@ public class LeapSecondsOffsetResultTests
         var outsideRes = LeapSeconds.GetOffset(outside);
 
         // assert
-        Assert.False(insideRes.IsStale);
-        Assert.True(outsideRes.IsStale);
-        Assert.True(outsideRes.OffsetSeconds >= insideRes.OffsetSeconds); // leap seconds non-decreasing historically
+        insideRes.IsStale.Should().BeFalse();
+        outsideRes.IsStale.Should().BeTrue();
+        outsideRes.OffsetSeconds.Should().BeGreaterThanOrEqualTo(insideRes.OffsetSeconds);
 
         LeapSeconds.StrictMode = prevStrict;
     }

@@ -4,6 +4,8 @@ using System.IO;
 using Asterism.Time;
 using Asterism.Time.Providers;
 
+using AwesomeAssertions;
+
 using Xunit;
 
 namespace Asterism.Time.Tests;
@@ -29,9 +31,9 @@ public class TimeScaleConversionTests
         var ttDelta = (jdTt - jdUtc) * 86400.0;
 
         // assert
-        Assert.InRange(Math.Abs(utcToTai - taiDelta), 0, 1e-4);
-        Assert.InRange(Math.Abs(utcToTt - ttDelta), 0, 1e-4);
-        Assert.True(utcToTt > utcToTai); // TT includes +32.184 s
+        Math.Abs(utcToTai - taiDelta).Should().BeLessThanOrEqualTo(1e-4);
+        Math.Abs(utcToTt - ttDelta).Should().BeLessThanOrEqualTo(1e-4);
+        utcToTt.Should().BeGreaterThan(utcToTai);
     }
 
     [Fact]
@@ -53,8 +55,8 @@ public class TimeScaleConversionTests
         var jdUt1_2 = jdTt2 - provider2.DeltaTSeconds(utc) / 86400.0;
 
         // assert (TT changes because we compute TT from UTC independent of ΔT; UT1 inferred moves with ΔT)
-        Assert.Equal(jdTt, jdTt2); // ΔT does not alter TT itself
-        Assert.NotEqual(jdUt1, jdUt1_2); // inferred UT1 differs
+        jdTt2.Should().Be(jdTt);
+        jdUt1_2.Should().NotBe(jdUt1);
     }
 
     private sealed class TestDeltaTProvider : IDeltaTProvider
