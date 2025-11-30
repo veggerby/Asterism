@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+    <AssemblyName>Asterism.Time</AssemblyName>
+    <RootNamespace>Asterism.Time</RootNamespace>
+    <PackageId>Asterism.Time</PackageId>
+    <!-- Version managed by GitVersion during CI; omit explicit <Version> to avoid divergence -->
+    <Description>Time scales for astronomy in .NET: UTC/TAI/TT/TDB, Julian Day, ΔT &amp; leap seconds.</Description>
+    <Authors>Jesper Veggerby</Authors>
+    <RepositoryUrl>https://github.com/veggerby/asterism</RepositoryUrl>
+    <PackageTags>astronomy;time;julian-day;leap-seconds;tt;tdb</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryType>git</RepositoryType>
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="/" Condition="Exists('$(MSBuildThisFileDirectory)../../README.md')" />
+  </ItemGroup>
+</Project>

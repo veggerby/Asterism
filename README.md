@@ -111,14 +111,72 @@ dotnet run -c Release -p bench/Asterism.Benchmarks
 - Planned: hybrid ΔT (historical table + polynomial extrapolation)
 - All transforms validated against [IAU SOFA](https://www.iausofa.org/) reference algorithms
 
-**Important:** conversions beyond the last leap second are undefined; `Asterism.Time` will refuse to guess. Update the package for fresh data.
+**Leap seconds & staleness:** The bundled leap-second table currently ends at 2017-01-01 (TAI−UTC = 37s). By default, future instants reuse the last known offset and are marked as *stale* (query via `LeapSeconds.IsStale` or `LeapSeconds.GetOffset`). Enable strict mode (set env `ASTERISM_TIME_STRICT_LEAP_SECONDS=true` or toggle `LeapSeconds.StrictMode`) to throw instead when an instant lies beyond the configurable horizon (default 15 years past the last table entry).
+
+### Provider cookbook
+
+You can swap data providers at application startup (atomic publication helpers provided). All `Set*` operations use `Interlocked.Exchange` for thread-safety:
+
+```csharp
+using Asterism.Time;
+
+TimeProviders.SetLeapSeconds(new LeapSecondFileProvider("leap_seconds.csv"));
+TimeProviders.SetDeltaT(new DeltaTBlendedProvider());
+TimeProviders.SetEop(new EopNoneProvider()); // or new CsvEopProvider("eop.csv") when you have daily EOP (ΔUT1, polar motion, CIP)
+TimeProviders.SetTdb(new SimpleTdbProvider()); // or new MeeusTdbProvider() for expanded periodic series
+```
+
+These should typically be configured once during startup. Repeated swaps (e.g. reloading EOP tables) are safe; each Set* call uses Interlocked.Exchange for atomic replacement.
+
+Leap second CSV schema:
+
+```text
+# ISO8601_UTC,TAI_MINUS_UTC
+1972-07-01T00:00:00Z,11
+...
+2017-01-01T00:00:00Z,37
+```
+
+Update the package (or supply a custom provider) to refresh data when new leap seconds are announced.
+
+Daily EOP CSV schema (minimal):
+
+```text
+# date,dut1_seconds
+2025-01-01,0.114843
+2025-01-02,0.115004
+```
+
+Extended schema (adds polar motion and CIP offsets; blank/missing trailing fields treated as null):
+
+```text
+# date,dut1_seconds,x_p_arcsec,y_p_arcsec,dX_arcsec,dY_arcsec
+2025-01-01,0.114843,0.03412,0.27651,0.00012,-0.00009
+```
+
+API access (grouped structs):
+
+```csharp
+var dut1 = provider.GetDeltaUt1(utc);
+var pm = provider.GetPolarMotion(utc); // PolarMotion? with XPArcsec, YPArcsec
+var cip = provider.GetCipOffsets(utc); // CipOffsets? with DXArcsec, DYArcsec
+```
+```
+
+Reload leap seconds or EOP at runtime (atomic hot-swap):
+
+```csharp
+TimeProviders.ReloadLeapSecondsFromFile("leap_seconds.csv");
+TimeProviders.SetEop(new CsvEopProvider("dut1.csv"));
+TimeProviders.SetTdb(new MeeusTdbProvider());
+```
 
 ---
 
 ## 📅 Roadmap
 
 - [x] v0.1 — UTC/TAI/TT/TDB; JD/MJD; leap-seconds; Equatorial→Horizontal
-- [ ] v0.2 — IAU 2006 precession + IAU 2000A nutation; better sidereal
+- [ ] v0.2 — IAU 2006 precession + IAU 2000A nutation; improved sidereal & ERA
 - [ ] v0.3 — Ecliptic & Galactic frames; proper motion & parallax
 - [ ] v0.4 — Aberration, advanced refraction, EOP ingestion
 

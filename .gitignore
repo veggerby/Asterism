@@ -236,3 +236,5 @@ _Pvt_Extensions
 
 
 # (Trimmed front-end ignores removed as project is pure .NET)
+
+BenchmarkDotNet.Artifacts/results
