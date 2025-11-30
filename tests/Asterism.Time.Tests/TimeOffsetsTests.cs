@@ -91,13 +91,23 @@ public sealed class TimeOffsetsTests
     {
         // arrange
         var farFuture = DateTime.UtcNow.AddYears(50);
+        var prevStrict = LeapSeconds.StrictMode;
 
-        // act
-        var (offset, isStale) = TimeOffsets.SecondsUtcToTaiWithStale(farFuture);
+        try
+        {
+            LeapSeconds.StrictMode = false; // ensure non-throwing path for this test
 
-        // assert
-        offset.Should().Be(37); // Still returns last known offset
-        isStale.Should().Be(true);
+            // act
+            var (offset, isStale) = TimeOffsets.SecondsUtcToTaiWithStale(farFuture);
+
+            // assert
+            offset.Should().Be(37); // Still returns last known offset
+            isStale.Should().Be(true);
+        }
+        finally
+        {
+            LeapSeconds.StrictMode = prevStrict;
+        }
     }
 
     [Fact]
