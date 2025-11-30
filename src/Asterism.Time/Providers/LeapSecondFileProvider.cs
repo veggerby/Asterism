@@ -67,7 +67,10 @@ public sealed class LeapSecondFileProvider : ILeapSecondProvider
         {
             TimeProviders.Metrics.IncrementLeapSecondHit();
         }
-        catch { }
+        catch (Exception)
+        {
+            // Swallow metric failures silently; metric emission is non-critical.
+        }
         return (offset, LastChangeUtc);
     }
 

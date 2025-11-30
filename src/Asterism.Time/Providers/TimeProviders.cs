@@ -124,7 +124,10 @@ public static class TimeProviders
         {
             Logger.LeapSecondReload(provider.Source, true, null);
         }
-        catch { }
+        catch (Exception)
+        {
+            // Swallow logging failures silently; logging is non-critical.
+        }
         return previous;
     }
 }

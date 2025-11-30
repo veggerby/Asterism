@@ -24,7 +24,7 @@ public class LeapSecondExtrasTests
 
         try
         {
-            var off = provider.GetOffset(new DateTime(2018, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+            provider.GetOffset(new DateTime(2018, 1, 1, 0, 0, 0, DateTimeKind.Utc));
             // metric should be incremented once
             sink.LeapHit.Should().BeGreaterThan(0);
         }

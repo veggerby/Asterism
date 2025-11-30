@@ -32,8 +32,7 @@ public static class TimeScaleConversion
         double ttMinusUtc = taiMinusUtc + 32.184;
         // ΔT = TT - UT1 => UT1 - UTC = (TT - ΔT) - UTC = ttMinusUtc - ΔT
         deltaTProvider ??= TimeProviders.DeltaT;
-        double deltaT = deltaTProvider.DeltaTSeconds(instantUtc);
-        double ut1MinusUtc = ttMinusUtc - deltaT;
+        _ = deltaTProvider.DeltaTSeconds(instantUtc); // UT1 - UTC computed when needed for UT1 scale
         // TDB - TT small periodic correction
         var astro = AstroInstant.FromUtc(instantUtc);
         double tdbMinusTt = TimeProviders.Tdb.GetTdbMinusTtSeconds(astro.ToJulianDay(TimeScale.TT));
