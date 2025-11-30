@@ -163,7 +163,7 @@ public sealed class AstroInstantTests
         mockProvider.DeltaTSeconds(Arg.Any<DateTime>()).Returns(100.0);
 
         // act
-        var jd = instant.ToJulianDay(TimeScale.TT, mockProvider);
+        _ = instant.ToJulianDay(TimeScale.TT, mockProvider);
 
         // assert
         mockProvider.Received(1).DeltaTSeconds(utc);
@@ -184,7 +184,7 @@ public sealed class AstroInstantTests
             TimeProviders.SetDeltaT(mockProvider);
 
             // act
-            var jd = instant.ToJulianDay(TimeScale.TT, null);
+            _ = instant.ToJulianDay(TimeScale.TT, null);
 
             // assert
             mockProvider.Received(1).DeltaTSeconds(utc);

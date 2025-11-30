@@ -117,7 +117,7 @@ public sealed class TimeOffsetsTests
         var oldDate = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         // act
-        var (offset, isStale) = TimeOffsets.SecondsUtcToTaiWithStale(oldDate);
+        var (_, isStale) = TimeOffsets.SecondsUtcToTaiWithStale(oldDate);
 
         // assert
         isStale.Should().Be(false);

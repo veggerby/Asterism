@@ -54,9 +54,7 @@ public readonly record struct AstroInstant(DateTime Utc)
 
         // ΔT = TT − UT1 (seconds)
         deltaT ??= TimeProviders.DeltaT;
-        var deltaTSeconds = deltaT.DeltaTSeconds(Utc);
-        // UT1 JD available if needed for high-precision sidereal or Earth rotation coupling
-        var jdUt1 = jdTt - (deltaTSeconds / 86400.0); // rearranged: UT1 = TT − ΔT (currently unused here)
+        _ = deltaT.DeltaTSeconds(Utc); // UT1 JD available if needed for high-precision sidereal or Earth rotation coupling
 
         return scale switch
         {

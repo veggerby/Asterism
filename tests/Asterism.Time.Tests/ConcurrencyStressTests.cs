@@ -21,7 +21,7 @@ public class ConcurrencyStressTests
     public async Task Parallel_Provider_Swaps_And_Lookups_DoNotThrow()
     {
         // arrange
-        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(3));
         var errors = new ConcurrentBag<Exception>();
         var baselineLeap = TimeProviders.LeapSeconds; // existing public provider
 
@@ -66,9 +66,9 @@ public class ConcurrencyStressTests
         // act
         // Run for allotted time (not passing token so we control cancellation explicitly)
         await Task.Delay(TimeSpan.FromSeconds(2.5));
-        cts.Cancel();
-        try { await Task.WhenAll(lookupTasks); } catch (TaskCanceledException) { }
-        try { await swapTask; } catch (TaskCanceledException) { }
+        await cts.CancelAsync();
+        try { await Task.WhenAll(lookupTasks); } catch (OperationCanceledException) { /* expected on cancellation */ }
+        try { await swapTask; } catch (OperationCanceledException) { /* expected on cancellation */ }
 
         // assert
         errors.Should().BeEmpty();
