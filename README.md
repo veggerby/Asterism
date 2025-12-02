@@ -52,6 +52,15 @@ var vega = new Equatorial(Angle.Hours(18.61565), Angle.Degrees(38.78369), Epoch.
 var altaz = vega.ToHorizontal(site, now);
 
 Console.WriteLine($"Alt {altaz.Altitude.ToDegrees():F2}°, Az {altaz.Azimuth.ToDegrees():F2}°");
+
+// Calculate solar events
+var location = GeographicCoordinates.FromDegrees(55.71, 9.53); // Vejle, Denmark
+var today = DateOnly.FromDateTime(DateTime.Today);
+var solarEvents = Solar.GetEvents(location, today, TimeZoneInfo.Local);
+
+Console.WriteLine($"Sunrise: {solarEvents.Sunrise}");
+Console.WriteLine($"Solar Noon: {solarEvents.SolarNoon}");
+Console.WriteLine($"Sunset: {solarEvents.Sunset}");
 ```
 
 ---
@@ -63,6 +72,7 @@ Console.WriteLine($"Alt {altaz.Altitude.ToDegrees():F2}°, Az {altaz.Azimuth.ToD
   - UTC ↔ TAI ↔ TT ↔ TDB
   - Julian Day / Modified Julian Day
   - ΔT model + leap-seconds snapshot
+  - Solar ephemeris (sunrise, solar noon, sunset, twilight)
 - `Asterism.Coordinates` (depends on `Asterism.Time`)
 
   - Equatorial, Ecliptic, Galactic, Horizontal frames

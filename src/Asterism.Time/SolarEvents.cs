@@ -5,7 +5,7 @@ namespace Asterism.Time;
 /// All times are expressed as <see cref="DateTimeOffset"/> in the specified time zone.
 /// </summary>
 /// <param name="Sunrise">The time of sunrise (upper limb of sun crosses horizon).</param>
-/// <param name="SolarNoon">The time when the sun reaches its highest point (solar apex).</param>
+/// <param name="SolarNoon">The time when the sun reaches its highest point in the sky (solar culmination).</param>
 /// <param name="Sunset">The time of sunset (upper limb of sun crosses horizon).</param>
 /// <param name="CivilDawn">The time when civil twilight begins (sun 6° below horizon). May be null in polar regions.</param>
 /// <param name="CivilDusk">The time when civil twilight ends (sun 6° below horizon). May be null in polar regions.</param>
