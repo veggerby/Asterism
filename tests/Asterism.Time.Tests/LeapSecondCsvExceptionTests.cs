@@ -1,4 +1,5 @@
 using Asterism.Time;
+
 using AwesomeAssertions;
 
 namespace Asterism.Time.Tests;
@@ -39,7 +40,7 @@ public sealed class LeapSecondCsvExceptionTests
     public void CanBeThrown()
     {
         // arrange & act & assert
-        void ThrowException() => throw new LeapSecondCsvException(1, "Test");
+        static void ThrowException() => throw new LeapSecondCsvException(1, "Test");
         Assert.Throws<LeapSecondCsvException>(ThrowException);
     }
 
