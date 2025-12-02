@@ -1,4 +1,5 @@
 using Asterism.Time;
+
 using AwesomeAssertions;
 
 namespace Asterism.Time.Tests;
@@ -7,7 +8,7 @@ public sealed class SolarTests
 {
     // Test data from NOAA Solar Calculator:
     // https://gml.noaa.gov/grad/solcalc/
-    
+
     [Fact]
     public void GetEvents_InvalidLatitude_ThrowsArgumentOutOfRangeException()
     {
@@ -307,7 +308,7 @@ public sealed class SolarTests
         var time1 = events1.SolarNoon.TimeOfDay;
         var time2 = events2.SolarNoon.TimeOfDay;
         var timeDiff = Math.Abs((time2 - time1).TotalMinutes);
-        
+
         // Solar noon time of day should shift by less than 2 minutes between consecutive days
         timeDiff.Should().BeLessThan(2.0);
     }
@@ -329,7 +330,7 @@ public sealed class SolarTests
         events2025.Sunrise.Should().NotBeNull();
 
         var sunriseDiff = Math.Abs((events2025.Sunrise!.Value.TimeOfDay - events2024.Sunrise!.Value.TimeOfDay).TotalMinutes);
-        
+
         // Should vary by less than 30 minutes year to year for same date
         sunriseDiff.Should().BeLessThan(30.0);
     }

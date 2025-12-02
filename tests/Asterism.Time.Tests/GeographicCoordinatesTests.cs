@@ -1,4 +1,5 @@
 using Asterism.Time;
+
 using AwesomeAssertions;
 
 namespace Asterism.Time.Tests;
@@ -31,9 +32,9 @@ public sealed class GeographicCoordinatesTests
     public void FromDegrees_LatitudeTooHigh_ThrowsArgumentOutOfRangeException()
     {
         // arrange & act & assert
-        var ex = Assert.Throws<ArgumentOutOfRangeException>(() => 
+        var ex = Assert.Throws<ArgumentOutOfRangeException>(() =>
             GeographicCoordinates.FromDegrees(91.0, 0.0));
-        
+
         ex.ParamName.Should().Be("Latitude");
     }
 
@@ -41,9 +42,9 @@ public sealed class GeographicCoordinatesTests
     public void FromDegrees_LatitudeTooLow_ThrowsArgumentOutOfRangeException()
     {
         // arrange & act & assert
-        var ex = Assert.Throws<ArgumentOutOfRangeException>(() => 
+        var ex = Assert.Throws<ArgumentOutOfRangeException>(() =>
             GeographicCoordinates.FromDegrees(-91.0, 0.0));
-        
+
         ex.ParamName.Should().Be("Latitude");
     }
 
@@ -51,9 +52,9 @@ public sealed class GeographicCoordinatesTests
     public void FromDegrees_LongitudeTooHigh_ThrowsArgumentOutOfRangeException()
     {
         // arrange & act & assert
-        var ex = Assert.Throws<ArgumentOutOfRangeException>(() => 
+        var ex = Assert.Throws<ArgumentOutOfRangeException>(() =>
             GeographicCoordinates.FromDegrees(0.0, 181.0));
-        
+
         ex.ParamName.Should().Be("Longitude");
     }
 
@@ -61,9 +62,9 @@ public sealed class GeographicCoordinatesTests
     public void FromDegrees_LongitudeTooLow_ThrowsArgumentOutOfRangeException()
     {
         // arrange & act & assert
-        var ex = Assert.Throws<ArgumentOutOfRangeException>(() => 
+        var ex = Assert.Throws<ArgumentOutOfRangeException>(() =>
             GeographicCoordinates.FromDegrees(0.0, -181.0));
-        
+
         ex.ParamName.Should().Be("Longitude");
     }
 

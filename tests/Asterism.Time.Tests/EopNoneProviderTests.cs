@@ -1,4 +1,5 @@
 using Asterism.Time.Providers;
+
 using AwesomeAssertions;
 
 namespace Asterism.Time.Tests;

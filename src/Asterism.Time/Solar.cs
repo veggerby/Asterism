@@ -134,7 +134,7 @@ public static class Solar
         declination = SolarDeclination(newT);
 
         cosHourAngle = (Cos(zenith) - Sin(latitude) * Sin(declination)) / (Cos(latitude) * Cos(declination));
-        
+
         if (cosHourAngle > 1.0 || cosHourAngle < -1.0)
         {
             return null;

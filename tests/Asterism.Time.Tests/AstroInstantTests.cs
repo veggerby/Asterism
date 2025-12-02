@@ -1,6 +1,8 @@
 using Asterism.Time;
 using Asterism.Time.Providers;
+
 using AwesomeAssertions;
+
 using NSubstitute;
 
 namespace Asterism.Time.Tests;
@@ -178,7 +180,7 @@ public sealed class AstroInstantTests
         var originalProvider = TimeProviders.DeltaT;
         var mockProvider = Substitute.For<IDeltaTProvider>();
         mockProvider.DeltaTSeconds(Arg.Any<DateTime>()).Returns(70.0);
-        
+
         try
         {
             TimeProviders.SetDeltaT(mockProvider);
