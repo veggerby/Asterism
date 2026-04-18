@@ -150,4 +150,3 @@ public class EquatorialTests
         eq.RightAscension.ToDegrees().Should().BeInRange(0.0, 360.0);
     }
 }
-

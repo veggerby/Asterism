@@ -142,4 +142,3 @@ public class AngleTests
         angle.ToHours().Should().BeApproximately(expectedHours, 1e-10);
     }
 }
-

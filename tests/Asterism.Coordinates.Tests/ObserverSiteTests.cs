@@ -129,4 +129,3 @@ public class ObserverSiteTests
         s1.Should().NotBe(s3);
     }
 }
-
