@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+    <AssemblyName>Asterism.Coordinates</AssemblyName>
+    <RootNamespace>Asterism.Coordinates</RootNamespace>
+    <PackageId>Asterism.Coordinates</PackageId>
+    <Description>Astronomical coordinate value types and Equatorial to Horizontal transforms for .NET.</Description>
+    <Authors>Jesper Veggerby</Authors>
+    <RepositoryUrl>https://github.com/veggerby/asterism</RepositoryUrl>
+    <PackageTags>astronomy;coordinates;equatorial;horizontal;altaz;sidereal-time</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryType>git</RepositoryType>
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Asterism.Time/Asterism.Time.csproj" />
+    <None Include="../../README.md" Pack="true" PackagePath="/" Condition="Exists('$(MSBuildThisFileDirectory)../../README.md')" />
+  </ItemGroup>
+</Project>

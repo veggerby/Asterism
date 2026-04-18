@@ -24,6 +24,9 @@ Aggregated notable changes across all Asterism packages. For per-package details
 - Asterism.Time: atomic reload APIs (`ReloadLeapSecondsFromFile`) enabling hot data updates.
 - Asterism.Time: extended test suite covering provider swapping, horizon staleness boundaries, ΔT influence, TDB amplitude envelope, and EOP lookups.
 - Test infrastructure: serialization collection guarding global leap-second strict mode mutations to eliminate intermittent race in strict/stale tests.
+- Asterism.Coordinates: finalized package scaffold and public core coordinate types (`Angle`, `ObserverSite`, `Horizontal`, `Equatorial`, `Epoch`).
+- Asterism.Coordinates: deterministic Equatorial→Horizontal transform integration with `Asterism.Time` sidereal computations.
+- Asterism.Coordinates: dedicated xUnit test project with coverage for conversions and input validation.
 
 ### Changed
 

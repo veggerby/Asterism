@@ -40,9 +40,9 @@ public sealed class CsvEopProvider : IEopProvider
             line = line.Trim();
             if (line.Length == 0 || line.StartsWith('#')) { continue; }
             var parts = line.Split(',', StringSplitOptions.TrimEntries);
-            if (parts.Length < 2 || parts.Length == 3 || parts.Length == 4 || parts.Length == 5 || parts.Length > 6)
+            if (parts.Length is not (2 or 4 or 6))
             {
-                throw new FormatException("Expected 2 or 6 columns: date,dut1[,x_p,y_p,dX,dY]");
+                throw new FormatException("Expected 2, 4, or 6 columns: date,dut1[,x_p,y_p[,dX,dY]]");
             }
 
             if (!DateTime.TryParse(parts[0], CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out var date))
@@ -57,10 +57,14 @@ public sealed class CsvEopProvider : IEopProvider
             }
 
             double? x = null, y = null, dx = null, dy = null;
-            if (parts.Length >= 6)
+            if (parts.Length >= 4)
             {
                 x = ParseOptional(parts[2]);
                 y = ParseOptional(parts[3]);
+            }
+
+            if (parts.Length >= 6)
+            {
                 dx = ParseOptional(parts[4]);
                 dy = ParseOptional(parts[5]);
             }

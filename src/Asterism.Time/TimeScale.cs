@@ -18,5 +18,14 @@ public enum TimeScale
     /// <summary>Terrestrial Time: TAI + 32.184 s; geocentric ephemeris timescale.</summary>
     TT,
     /// <summary>Barycentric Dynamical Time: TT plus small periodic relativistic correction (approximate here).</summary>
-    TDB
+    TDB,
+    /// <summary>
+    /// Universal Time 1 (UT1): Earth rotation timescale.
+    /// <para>
+    /// When EOP data is registered via <see cref="Providers.TimeProviders.Eop"/>, the directly measured
+    /// ΔUT1 (UT1 − UTC) from the EOP provider is used (more precise for modern epochs).
+    /// Otherwise falls back to ΔT (TT − UT1) from the registered <see cref="IDeltaTProvider"/>.
+    /// </para>
+    /// </summary>
+    UT1 = 4
 }

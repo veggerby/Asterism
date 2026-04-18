@@ -8,12 +8,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ### Added
 
-- Expanded XML documentation for `Angle` and related value types.
-- Added parameter/return docs to factory helpers (`Angle.Degrees`, `Angle.Hours`).
+- Coordinates package scaffold finalized with `Asterism.Coordinates.csproj` (multi-target net8.0/net9.0, pack metadata, symbols/source-link settings).
+- Core value types: `Angle`, `ObserverSite`, `Horizontal`, and `Epoch`.
+- Equatorial coordinate model with deterministic `Equatorial.ToHorizontal(...)` conversion using `Asterism.Time` sidereal helpers.
+- XML documentation for all public coordinates APIs.
+- New test project `tests/Asterism.Coordinates.Tests` with deterministic coverage for value-type factories, site validation, and Equatorial→Horizontal conversion invariants.
 
 ### Changed
 
-- Minor formatting & spacing adjustments to align with repository `.editorconfig` (no API changes).
+- Solution wiring updated to include `Asterism.Coordinates` and `Asterism.Coordinates.Tests`.
 
 ## [0.1.0] - 2025-08-25
 

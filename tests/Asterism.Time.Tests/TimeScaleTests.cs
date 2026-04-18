@@ -17,6 +17,7 @@ public sealed class TimeScaleTests
         values.Should().Contain(TimeScale.TAI);
         values.Should().Contain(TimeScale.TT);
         values.Should().Contain(TimeScale.TDB);
+        values.Should().Contain(TimeScale.UT1);
     }
 
     [Fact]
@@ -26,7 +27,7 @@ public sealed class TimeScaleTests
         var values = Enum.GetValues<TimeScale>();
 
         // assert
-        values.Length.Should().Be(4);
+        values.Length.Should().Be(5);
     }
 
     [Theory]
@@ -34,6 +35,7 @@ public sealed class TimeScaleTests
     [InlineData(TimeScale.TAI)]
     [InlineData(TimeScale.TT)]
     [InlineData(TimeScale.TDB)]
+    [InlineData(TimeScale.UT1)]
     public void TimeScale_CanBeUsedInSwitch(TimeScale scale)
     {
         // arrange & act
@@ -41,9 +43,10 @@ public sealed class TimeScaleTests
         {
             TimeScale.UTC => "UTC",
             TimeScale.TAI => "TAI",
-            TimeScale.TT => "TT",
+            TimeScale.TT  => "TT",
             TimeScale.TDB => "TDB",
-            _ => "Unknown"
+            TimeScale.UT1 => "UT1",
+            _             => "Unknown"
         };
 
         // assert

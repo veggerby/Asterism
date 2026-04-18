@@ -57,4 +57,36 @@ public class TimeScaleConversionTests
         public TestDeltaTProvider(double value) { _value = value; }
         public double DeltaTSeconds(DateTime utc) => _value;
     }
+
+    [Fact]
+    public void Ut1Offset_DiffersFromTt_ByDeltaT()
+    {
+        // arrange – ΔT ≈ TT − UT1; for a fixed value the offset should match exactly
+        var utc = new DateTime(2020, 6, 1, 0, 0, 0, DateTimeKind.Utc);
+        const double deltaT = 70.0; // fixed test value
+        var provider = new TestDeltaTProvider(deltaT);
+
+        // act
+        var utcToTt  = TimeScaleConversion.GetOffsetSeconds(TimeScale.UTC, TimeScale.TT,  utc, provider);
+        var utcToUt1 = TimeScaleConversion.GetOffsetSeconds(TimeScale.UTC, TimeScale.UT1, utc, provider);
+
+        // UT1 - UTC = (TT - UTC) - ΔT
+        double expected = utcToTt - deltaT;
+        utcToUt1.Should().BeApproximately(expected, 1e-6);
+    }
+
+    [Fact]
+    public void Ut1Offset_FromUt1_ToTt_EqualsDeltaT()
+    {
+        // arrange
+        var utc = new DateTime(2020, 6, 1, 0, 0, 0, DateTimeKind.Utc);
+        const double deltaT = 69.36;
+        var provider = new TestDeltaTProvider(deltaT);
+
+        // act – TT - UT1 = ΔT
+        var tt_minus_ut1 = TimeScaleConversion.GetOffsetSeconds(TimeScale.UT1, TimeScale.TT, utc, provider);
+
+        // assert
+        tt_minus_ut1.Should().BeApproximately(deltaT, 1e-6);
+    }
 }
