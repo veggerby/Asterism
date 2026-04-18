@@ -62,7 +62,7 @@ public readonly record struct Equatorial
 
         var sinAltitude = (Math.Sin(declination) * Math.Sin(latitude))
             + (Math.Cos(declination) * Math.Cos(latitude) * Math.Cos(hourAngleRadians));
-        var altitude = Math.Asin(Clamp(sinAltitude, -1.0, 1.0));
+        var altitude = Math.Asin(Math.Clamp(sinAltitude, -1.0, 1.0));
 
         var azimuth = Math.Atan2(
             Math.Sin(hourAngleRadians),
@@ -94,20 +94,5 @@ public readonly record struct Equatorial
         }
 
         return normalized - Math.PI;
-    }
-
-    private static double Clamp(double value, double min, double max)
-    {
-        if (value < min)
-        {
-            return min;
-        }
-
-        if (value > max)
-        {
-            return max;
-        }
-
-        return value;
     }
 }
