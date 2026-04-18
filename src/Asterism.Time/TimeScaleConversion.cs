@@ -30,14 +30,25 @@ public static class TimeScaleConversion
         int taiMinusUtc = TimeOffsets.SecondsUtcToTai(instantUtc);
         // TT - UTC = (TAI - UTC) + 32.184
         double ttMinusUtc = taiMinusUtc + 32.184;
-        // ΔT = TT - UT1 => UT1 - UTC = ttMinusUtc - ΔT
-        deltaTProvider ??= TimeProviders.DeltaT;
-        double deltaTSeconds = deltaTProvider.DeltaTSeconds(instantUtc);
-        double ut1MinusUtc = ttMinusUtc - deltaTSeconds;
         // TDB - TT small periodic correction
         var astro = AstroInstant.FromUtc(instantUtc);
         double tdbMinusTt = TimeProviders.Tdb.GetTdbMinusTtSeconds(astro.ToJulianDay(TimeScale.TT));
         double tdbMinusUtc = ttMinusUtc + tdbMinusTt;
+
+        // UT1 offset is computed lazily, only when one of the requested scales is UT1.
+        double GetUt1MinusUtc()
+        {
+            // Prefer EOP ΔUT1 (UT1 − UTC) when available
+            var eopDeltaUt1 = TimeProviders.Eop.GetDeltaUt1(instantUtc);
+            if (eopDeltaUt1.HasValue)
+            {
+                return eopDeltaUt1.Value;
+            }
+
+            // Fallback: UT1 − UTC = (TT − UTC) − ΔT
+            deltaTProvider ??= TimeProviders.DeltaT;
+            return ttMinusUtc - deltaTProvider.DeltaTSeconds(instantUtc);
+        }
 
         double FromUtc(TimeScale scale) => scale switch
         {
@@ -45,7 +56,7 @@ public static class TimeScaleConversion
             TimeScale.TAI => taiMinusUtc,
             TimeScale.TT  => ttMinusUtc,
             TimeScale.TDB => tdbMinusUtc,
-            TimeScale.UT1 => ut1MinusUtc,
+            TimeScale.UT1 => GetUt1MinusUtc(),
             _             => 0d
         };
 

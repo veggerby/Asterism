@@ -20,11 +20,15 @@ public enum AccuracyProfile
     Standard = 1,
 
     /// <summary>
-    /// Ultra profile: same as <see cref="Standard"/> with Earth Orientation Parameter (EOP)
-    /// corrections (ΔUT1, polar motion) applied when an
-    /// <see cref="Asterism.Time.Providers.IEopProvider"/> is registered in
-    /// <see cref="Asterism.Time.Providers.TimeProviders"/>. Requires loading EOP data at startup.
-    /// Accuracy approximately 1 arcsecond.
+    /// Ultra profile: same as <see cref="Standard"/> in the current implementation.
+    /// <para>
+    /// Polar-motion corrections are not yet applied at this profile level. Note that
+    /// <see cref="Standard"/> already picks up the globally registered EOP ΔUT1 correction via
+    /// <see cref="Asterism.Time.SiderealTime.GastRadians"/>, so configuring an
+    /// <see cref="Asterism.Time.Providers.IEopProvider"/> in
+    /// <see cref="Asterism.Time.Providers.TimeProviders"/> improves accuracy at both Standard and
+    /// Ultra levels. Polar-motion support is planned for a future release.
+    /// </para>
     /// </summary>
     Ultra = 2
 }

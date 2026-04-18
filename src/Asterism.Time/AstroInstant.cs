@@ -38,7 +38,11 @@ public readonly record struct AstroInstant(DateTime Utc)
     /// TDB periodic relativistic correction. ΔT is obtained from the registered provider unless one is supplied.
     /// </summary>
     /// <param name="scale">Desired time scale (UTC, TAI, TT, TDB, or UT1).</param>
-    /// <param name="deltaT">Optional ΔT provider override (TT − UT1 in seconds). Defaults to <see cref="Providers.TimeProviders.DeltaT"/>.</param>
+    /// <param name="deltaT">
+    /// Optional ΔT provider override (TT − UT1 in seconds). Only consulted when <paramref name="scale"/>
+    /// is <see cref="TimeScale.UT1"/> and no EOP data is available. Defaults to
+    /// <see cref="Providers.TimeProviders.DeltaT"/>.
+    /// </param>
     /// <returns><see cref="JulianDay"/> corresponding to this instant in the requested time scale.</returns>
     public JulianDay ToJulianDay(TimeScale scale = TimeScale.TT, IDeltaTProvider? deltaT = null)
     {
@@ -52,18 +56,32 @@ public readonly record struct AstroInstant(DateTime Utc)
         // TT = TAI + 32.184 s
         var jdTt = jdTai + 32.184 / 86400.0;
 
-        // ΔT = TT − UT1 (seconds); used for UT1 scale
-        deltaT ??= TimeProviders.DeltaT;
-        var deltaTSeconds = deltaT.DeltaTSeconds(Utc);
-
         return scale switch
         {
             TimeScale.UTC => new(jdUtc),
             TimeScale.TAI => new(jdTai),
             TimeScale.TT  => new(jdTt),
             TimeScale.TDB => new(jdTt + TimeProviders.Tdb.GetTdbMinusTtSeconds(new JulianDay(jdTt)) / 86400.0),
-            TimeScale.UT1 => new(jdTt - deltaTSeconds / 86400.0),
+            TimeScale.UT1 => new(ComputeJdUt1(jdUtc, jdTt, deltaT)),
             _             => new(jdUtc)
         };
+    }
+
+    /// <summary>
+    /// Computes the UT1 Julian Day. Prefers the EOP provider's measured ΔUT1 (UT1 − UTC) when
+    /// available, falling back to ΔT (TT − UT1) from the <see cref="IDeltaTProvider"/>.
+    /// </summary>
+    private double ComputeJdUt1(double jdUtc, double jdTt, IDeltaTProvider? deltaT)
+    {
+        // Prefer EOP ΔUT1 (UT1 − UTC) when available: directly measured, more precise for modern epochs
+        var eopDeltaUt1 = TimeProviders.Eop.GetDeltaUt1(Utc);
+        if (eopDeltaUt1.HasValue)
+        {
+            return jdUtc + eopDeltaUt1.Value / 86400.0;
+        }
+
+        // Fallback: UT1 = TT − ΔT
+        deltaT ??= TimeProviders.DeltaT;
+        return jdTt - deltaT.DeltaTSeconds(Utc) / 86400.0;
     }
 }

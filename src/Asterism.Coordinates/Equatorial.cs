@@ -64,17 +64,19 @@ public readonly record struct Equatorial
         double ra  = RightAscension.Radians;
         double dec = Declination.Radians;
 
-        double siderealRadians;
+        // Apply precession from J2000.0 to date — only meaningful when coordinates are J2000-referenced.
         if (profile >= AccuracyProfile.Standard && Epoch == Epoch.J2000)
         {
             double jdTt = instant.ToJulianDay(TimeScale.TT).Value;
             (ra, dec) = Precession.J2000ToDate(ra, dec, jdTt);
-            siderealRadians = NormalizeUnsigned(SiderealTime.GastRadians(instant.Utc) + observerSite.Longitude.Radians);
         }
-        else
-        {
-            siderealRadians = NormalizeUnsigned(SiderealTime.GmstRadians(instant.Utc) + observerSite.Longitude.Radians);
-        }
+
+        // Sidereal time: GAST for Standard+ (equation of equinoxes, nutation), GMST for Fast.
+        // This choice is independent of Epoch.
+        double siderealBase = profile >= AccuracyProfile.Standard
+            ? SiderealTime.GastRadians(instant.Utc)
+            : SiderealTime.GmstRadians(instant.Utc);
+        double siderealRadians = NormalizeUnsigned(siderealBase + observerSite.Longitude.Radians);
 
         var hourAngleRadians = NormalizeSigned(siderealRadians - ra);
 

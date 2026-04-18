@@ -149,4 +149,25 @@ public class EquatorialTests
         // assert – RA normalised to [0, 360°)
         eq.RightAscension.ToDegrees().Should().BeInRange(0.0, 360.0);
     }
+
+    [Fact]
+    public void ToHorizontal_StandardProfile_UsesGast_EvenForEpochOfDate()
+    {
+        // arrange – the GAST/GMST choice should depend on profile, not epoch
+        var site = ObserverSite.FromDegrees(51.5, -0.1, 10.0);
+        var instant = AstroInstant.FromUtc(new DateTime(2025, 6, 21, 22, 0, 0, DateTimeKind.Utc));
+        // Same star coordinates expressed as OfDate (no precession should be applied)
+        var starOfDate = new Equatorial(Angle.Hours(18.61565), Angle.Degrees(38.78369), Epoch.OfDate);
+        var starJ2000  = new Equatorial(Angle.Hours(18.61565), Angle.Degrees(38.78369), Epoch.J2000);
+
+        // act – Standard with OfDate: precession is NOT applied (OfDate), but GAST should be used
+        var standardOfDate = starOfDate.ToHorizontal(site, instant, AccuracyProfile.Standard);
+        // Fast with J2000: GMST used, no precession
+        var fastJ2000 = starJ2000.ToHorizontal(site, instant, AccuracyProfile.Fast);
+
+        // assert – Standard(OfDate) should differ from Fast(J2000) because GAST ≠ GMST + refraction
+        bool altDiffers = Math.Abs(standardOfDate.Altitude.ToDegrees() - fastJ2000.Altitude.ToDegrees()) > 1e-6;
+        bool azDiffers  = Math.Abs(standardOfDate.Azimuth.ToDegrees()  - fastJ2000.Azimuth.ToDegrees())  > 1e-6;
+        (altDiffers || azDiffers).Should().BeTrue();
+    }
 }

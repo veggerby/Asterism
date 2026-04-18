@@ -20,9 +20,12 @@ public enum TimeScale
     /// <summary>Barycentric Dynamical Time: TT plus small periodic relativistic correction (approximate here).</summary>
     TDB,
     /// <summary>
-    /// Universal Time 1 (UT1): Earth rotation timescale derived from TT by subtracting ΔT (TT − UT1).
-    /// ΔT is sourced from the registered <see cref="IDeltaTProvider"/>. When EOP data is registered,
-    /// ΔUT1 = UT1 − UTC is used instead for modern epochs.
+    /// Universal Time 1 (UT1): Earth rotation timescale.
+    /// <para>
+    /// When EOP data is registered via <see cref="Providers.TimeProviders.Eop"/>, the directly measured
+    /// ΔUT1 (UT1 − UTC) from the EOP provider is used (more precise for modern epochs).
+    /// Otherwise falls back to ΔT (TT − UT1) from the registered <see cref="IDeltaTProvider"/>.
+    /// </para>
     /// </summary>
     UT1 = 4
 }
