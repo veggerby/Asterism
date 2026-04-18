@@ -47,27 +47,52 @@ public readonly record struct Equatorial
     /// </summary>
     /// <param name="observerSite">Observer site on Earth.</param>
     /// <param name="instant">Observation instant.</param>
+    /// <param name="profile">
+    /// Accuracy profile. <see cref="AccuracyProfile.Fast"/> (default) uses GMST without precession
+    /// or refraction. <see cref="AccuracyProfile.Standard"/> and above apply IAU 2006 simplified
+    /// precession from J2000.0, GAST (equation of the equinoxes), and Bennett atmospheric refraction.
+    /// </param>
     /// <returns>Horizontal altitude and azimuth coordinates.</returns>
     /// <remarks>
-    /// This implementation uses mean sidereal time (<see cref="SiderealTime.GmstRadians(DateTime, Asterism.Time.Providers.IEopProvider?)"/>)
-    /// without precession or nutation correction. <see cref="Epoch"/> is currently retained as metadata only.
+    /// The <see cref="AccuracyProfile.Fast"/> profile uses GMST (mean sidereal time) without
+    /// precession or nutation correction. <see cref="Epoch"/> is currently retained as metadata only
+    /// in the Fast profile. For Standard and Ultra profiles the J2000.0 coordinates are precessed
+    /// to the date of observation before the transformation.
     /// </remarks>
-    public Horizontal ToHorizontal(ObserverSite observerSite, AstroInstant instant)
+    public Horizontal ToHorizontal(ObserverSite observerSite, AstroInstant instant, AccuracyProfile profile = AccuracyProfile.Fast)
     {
-        var localSiderealRadians = NormalizeUnsigned(SiderealTime.GmstRadians(instant.Utc) + observerSite.Longitude.Radians);
-        var hourAngleRadians = NormalizeSigned(localSiderealRadians - RightAscension.Radians);
+        double ra  = RightAscension.Radians;
+        double dec = Declination.Radians;
+
+        double siderealRadians;
+        if (profile >= AccuracyProfile.Standard && Epoch == Epoch.J2000)
+        {
+            double jdTt = instant.ToJulianDay(TimeScale.TT).Value;
+            (ra, dec) = Precession.J2000ToDate(ra, dec, jdTt);
+            siderealRadians = NormalizeUnsigned(SiderealTime.GastRadians(instant.Utc) + observerSite.Longitude.Radians);
+        }
+        else
+        {
+            siderealRadians = NormalizeUnsigned(SiderealTime.GmstRadians(instant.Utc) + observerSite.Longitude.Radians);
+        }
+
+        var hourAngleRadians = NormalizeSigned(siderealRadians - ra);
 
         var latitude = observerSite.Latitude.Radians;
-        var declination = Declination.Radians;
 
-        var sinAltitude = (Math.Sin(declination) * Math.Sin(latitude))
-            + (Math.Cos(declination) * Math.Cos(latitude) * Math.Cos(hourAngleRadians));
+        var sinAltitude = (Math.Sin(dec) * Math.Sin(latitude))
+            + (Math.Cos(dec) * Math.Cos(latitude) * Math.Cos(hourAngleRadians));
         var altitude = Math.Asin(Math.Clamp(sinAltitude, -1.0, 1.0));
 
         var azimuth = Math.Atan2(
             Math.Sin(hourAngleRadians),
-            (Math.Cos(hourAngleRadians) * Math.Sin(latitude)) - (Math.Tan(declination) * Math.Cos(latitude)));
+            (Math.Cos(hourAngleRadians) * Math.Sin(latitude)) - (Math.Tan(dec) * Math.Cos(latitude)));
         azimuth = NormalizeUnsigned(azimuth + Math.PI);
+
+        if (profile >= AccuracyProfile.Standard)
+        {
+            altitude += AtmosphericRefraction.RefractionRadians(altitude);
+        }
 
         return new Horizontal(new Angle(altitude), new Angle(azimuth));
     }

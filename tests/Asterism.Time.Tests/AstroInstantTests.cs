@@ -222,4 +222,54 @@ public sealed class AstroInstantTests
         // act & assert
         instant1.GetHashCode().Should().Be(instant2.GetHashCode());
     }
+
+    [Fact]
+    public void ToJulianDay_Ut1_DiffersFromTt_ByApproxDeltaT()
+    {
+        // arrange – ΔT for modern dates is around 69–72 seconds
+        var utc = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        var instant = AstroInstant.FromUtc(utc);
+
+        // act
+        var jdTt  = instant.ToJulianDay(TimeScale.TT);
+        var jdUt1 = instant.ToJulianDay(TimeScale.UT1);
+
+        // assert – TT - UT1 = ΔT ≈ 69 s, allow ±10 s
+        double diffSeconds = (jdTt.Value - jdUt1.Value) * 86400.0;
+        diffSeconds.Should().BeInRange(55.0, 80.0);
+    }
+
+    [Fact]
+    public void ToJulianDay_Ut1_WithFixedDeltaT_IsExact()
+    {
+        // arrange
+        var utc = new DateTime(2025, 6, 15, 0, 0, 0, DateTimeKind.Utc);
+        var instant = AstroInstant.FromUtc(utc);
+        const double fixedDeltaT = 70.0; // seconds
+        var mockProvider = NSubstitute.Substitute.For<IDeltaTProvider>();
+        mockProvider.DeltaTSeconds(Arg.Any<DateTime>()).Returns(fixedDeltaT);
+
+        // act
+        var jdTt  = instant.ToJulianDay(TimeScale.TT,  mockProvider);
+        var jdUt1 = instant.ToJulianDay(TimeScale.UT1, mockProvider);
+
+        // assert – UT1 = TT - ΔT; floating-point precision in JD arithmetic means we allow ±0.001 s
+        double diffSeconds = (jdTt.Value - jdUt1.Value) * 86400.0;
+        diffSeconds.Should().BeApproximately(fixedDeltaT, 0.001);
+    }
+
+    [Fact]
+    public void ToJulianDay_Ut1_IsLessThanTt_ForModernDates()
+    {
+        // arrange – ΔT is positive for modern era so UT1 < TT
+        var utc = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        var instant = AstroInstant.FromUtc(utc);
+
+        // act
+        var jdTt  = instant.ToJulianDay(TimeScale.TT);
+        var jdUt1 = instant.ToJulianDay(TimeScale.UT1);
+
+        // assert
+        jdUt1.Value.Should().BeLessThan(jdTt.Value);
+    }
 }

@@ -30,9 +30,10 @@ public static class TimeScaleConversion
         int taiMinusUtc = TimeOffsets.SecondsUtcToTai(instantUtc);
         // TT - UTC = (TAI - UTC) + 32.184
         double ttMinusUtc = taiMinusUtc + 32.184;
-        // ΔT = TT - UT1 => UT1 - UTC = (TT - ΔT) - UTC = ttMinusUtc - ΔT
+        // ΔT = TT - UT1 => UT1 - UTC = ttMinusUtc - ΔT
         deltaTProvider ??= TimeProviders.DeltaT;
-        _ = deltaTProvider.DeltaTSeconds(instantUtc); // UT1 - UTC computed when needed for UT1 scale
+        double deltaTSeconds = deltaTProvider.DeltaTSeconds(instantUtc);
+        double ut1MinusUtc = ttMinusUtc - deltaTSeconds;
         // TDB - TT small periodic correction
         var astro = AstroInstant.FromUtc(instantUtc);
         double tdbMinusTt = TimeProviders.Tdb.GetTdbMinusTtSeconds(astro.ToJulianDay(TimeScale.TT));
@@ -42,9 +43,10 @@ public static class TimeScaleConversion
         {
             TimeScale.UTC => 0d,
             TimeScale.TAI => taiMinusUtc,
-            TimeScale.TT => ttMinusUtc,
+            TimeScale.TT  => ttMinusUtc,
             TimeScale.TDB => tdbMinusUtc,
-            _ => 0d
+            TimeScale.UT1 => ut1MinusUtc,
+            _             => 0d
         };
 
         double utcToFrom = FromUtc(from);

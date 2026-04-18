@@ -18,5 +18,11 @@ public enum TimeScale
     /// <summary>Terrestrial Time: TAI + 32.184 s; geocentric ephemeris timescale.</summary>
     TT,
     /// <summary>Barycentric Dynamical Time: TT plus small periodic relativistic correction (approximate here).</summary>
-    TDB
+    TDB,
+    /// <summary>
+    /// Universal Time 1 (UT1): Earth rotation timescale derived from TT by subtracting ΔT (TT − UT1).
+    /// ΔT is sourced from the registered <see cref="IDeltaTProvider"/>. When EOP data is registered,
+    /// ΔUT1 = UT1 − UTC is used instead for modern epochs.
+    /// </summary>
+    UT1 = 4
 }
