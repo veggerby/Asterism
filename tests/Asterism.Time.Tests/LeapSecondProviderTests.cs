@@ -1,9 +1,11 @@
 using Asterism.Time.Providers;
+using Asterism.Time.Tests.Infrastructure;
 
 using AwesomeAssertions;
 
 namespace Asterism.Time.Tests;
 
+[Collection("LeapSecondState")]
 public class LeapSecondProviderTests
 {
     [Fact]
@@ -12,18 +14,30 @@ public class LeapSecondProviderTests
         // arrange
         var before = new DateTime(2016, 12, 31, 23, 59, 59, DateTimeKind.Utc);
         var after = new DateTime(2017, 01, 01, 00, 00, 00, DateTimeKind.Utc);
+        var prevLeap = TimeProviders.LeapSeconds;
+        var path = Path.Combine(AppContext.BaseDirectory, "Assets", "leap_seconds_sample.csv");
+        var fileProvider = new LeapSecondFileProvider(path);
 
-        // act
-        var beforeOffset = TimeProviders.LeapSeconds.GetOffset(before).taiMinusUtcSeconds;
-        var afterOffset = TimeProviders.LeapSeconds.GetOffset(after).taiMinusUtcSeconds;
-        var lastChange = TimeProviders.LeapSeconds.LastChangeUtc;
+        try
+        {
+            TimeProviders.SetLeapSeconds(fileProvider);
 
-        // assert
-        beforeOffset.Should().Be(36);
-        afterOffset.Should().Be(37);
-        // Last change (actual leap second insertion) should be 2017-01-01 while last supported instant may extend beyond
-        lastChange.Should().Be(new DateTime(2017, 01, 01, 0, 0, 0, DateTimeKind.Utc));
-        (LeapSeconds.LastSupportedInstantUtc >= lastChange).Should().BeTrue();
+            // act
+            var beforeOffset = TimeProviders.LeapSeconds.GetOffset(before).taiMinusUtcSeconds;
+            var afterOffset = TimeProviders.LeapSeconds.GetOffset(after).taiMinusUtcSeconds;
+            var lastChange = TimeProviders.LeapSeconds.LastChangeUtc;
+
+            // assert
+            beforeOffset.Should().Be(36);
+            afterOffset.Should().Be(37);
+            // Last change (actual leap second insertion) should be 2017-01-01 while last supported instant may extend beyond
+            lastChange.Should().Be(new DateTime(2017, 01, 01, 0, 0, 0, DateTimeKind.Utc));
+            (LeapSeconds.LastSupportedInstantUtc >= lastChange).Should().BeTrue();
+        }
+        finally
+        {
+            TimeProviders.SetLeapSeconds(prevLeap);
+        }
     }
 
     [Fact]
